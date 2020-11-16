@@ -14,7 +14,8 @@ Note:
     Timezone support is not currently implemented.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
-from src import six
+#from src import six
+import six
 import re
 import datetime
 import operator as op
