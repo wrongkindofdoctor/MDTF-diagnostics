@@ -1,6 +1,14 @@
 # run Black Code Formatter on python modules
 name : black_code
 on : [push]
+  paths-ignore:
+    'doc/**'
+  paths:
+    ./*.py
+    */*.py
+    */*.py
+    */*/*.py
+    */*/*/*.py
 
 jobs:
   lint:
@@ -8,10 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
-      - uses: psf/black@stable
-      - name: Analyze the code
-        run: |
-          black -S `ls ./ |grep .py$|xargs`
-          black -S `ls -d */* |grep .py$|xargs`
-          black -S `ls -d */*/* |grep .py$|xargs`
-          black -S `ls -d */*/*/* |grep .py$|xargs`
+      - name: Analyze code with black
+        uses: psf/black@stable
+        with:
+          args: -S
