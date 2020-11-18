@@ -3,11 +3,7 @@ name : black_code
 on : 
   push: 
     paths:
-      - './**.py'
-      - '*/**.py'
-      - '*/**.py'
-      - '*/*/**.py'
-      - '*/*/*/**.py'
+      - '**.py'
 
 jobs:
   lint:
