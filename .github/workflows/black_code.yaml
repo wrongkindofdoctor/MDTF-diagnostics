@@ -1,9 +1,6 @@
 # run Black Code Formatter on python modules
 name : black_code
-on : 
-  push: 
-    paths:
-      - '**.py'
+on : push
 
 jobs:
   lint:
@@ -13,4 +10,4 @@ jobs:
       - uses: actions/setup-python@v2
       - uses: psf/black@stable
       - name: Analyze code with black
-        run: black -S
+        run: black -S */*.py
