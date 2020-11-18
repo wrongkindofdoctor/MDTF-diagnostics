@@ -1,14 +1,15 @@
 # run Black Code Formatter on python modules
 name : black_code
-on : push
-  paths-ignore:
-    'doc/**'
-  paths:
-    ./*.py
-    */*.py
-    */*.py
-    */*/*.py
-    */*/*/*.py
+on : 
+  push: 
+    paths-ignore:
+      - 'doc/**'
+    paths:
+      - './*.py'
+      - '*/*.py'
+      - '*/*.py'
+      - '*/*/*.py'
+      - '*/*/*/*.py'
 
 jobs:
   lint:
