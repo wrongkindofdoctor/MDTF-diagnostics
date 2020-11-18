@@ -18,4 +18,4 @@ jobs:
       - name: Analyze code with black
         uses: psf/black@stable
         with:
-          args: -S
+          args: black -S
