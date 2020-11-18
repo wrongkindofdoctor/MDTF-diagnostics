@@ -3,11 +3,11 @@ name : black_code
 on : 
   push: 
     paths:
-      - './*.py'
-      - '*/*.py'
-      - '*/*.py'
-      - '*/*/*.py'
-      - '*/*/*/*.py'
+      - './**.py'
+      - '*/**.py'
+      - '*/**.py'
+      - '*/*/**.py'
+      - '*/*/*/**.py'
 
 jobs:
   lint:
@@ -18,4 +18,4 @@ jobs:
       - name: Analyze code with black
         uses: psf/black@stable
         with:
-          args: black -S
+          args: -S
