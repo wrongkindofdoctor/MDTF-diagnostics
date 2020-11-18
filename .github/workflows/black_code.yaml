@@ -1,6 +1,6 @@
 # run Black Code Formatter on python modules
 name : black_code
-on : [push]
+on : push
   paths-ignore:
     'doc/**'
   paths:
