@@ -11,7 +11,7 @@ jobs:
       - uses: psf/black@stable
       - name: Analyze the code
         run: |
-          black -S --color `ls ./ |grep .py$|xargs`
-          black -S --color `ls -d */* |grep .py$|xargs`
-          black -S --color `ls -d */*/* |grep .py$|xargs`
-          black -S --color `ls -d */*/*/* |grep .py$|xargs`
+          black -S `ls ./ |grep .py$|xargs`
+          black -S `ls -d */* |grep .py$|xargs`
+          black -S `ls -d */*/* |grep .py$|xargs`
+          black -S `ls -d */*/*/* |grep .py$|xargs`
