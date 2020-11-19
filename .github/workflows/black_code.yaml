@@ -10,4 +10,5 @@ jobs:
       - uses: actions/setup-python@v2
       - uses: psf/black@stable
       - name: Analyze code with black
-        run: black -S */*.py
+        run: black --ignore-string-normalization \
+            `ls -1 *.py && ls -1 */*.py && ls -1 */*/*.py && ls -1 */*/*/*.py`
