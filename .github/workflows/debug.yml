@@ -1,0 +1,33 @@
+# This file builds and runs a lightweight version of the MDTF test suite.
+# Note that the tests assess functionality of the diagnostics, 
+# and do not evaluate data or scientific content. 
+name: debug
+
+on:
+  push:
+    branches:
+      - main
+#      - feature/github_actions_workflow
+defaults:
+  run:
+    shell: bash -l {0}
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 2
+
+    steps:
+    - name: Set env
+      run: |
+        echo "POD_OUTPUT=wkdir/MDTF_NCAR-CAM5.timeslice_2000_2004" >> $GITHUB_ENV
+        echo "POD_OUTPUT_b=$(echo $PWD/wkdir/MDTF_NCAR-CAM5.timeslice_2000_2004)" >> $GITHUB_ENV
+    - name: Test
+      run: | 
+        echo ${PWD}
+        echo ${POD_OUTPUT}
+        echo "POD_OUTPUT B/blah is"
+        echo "${POD_OUTPUT_b}/blah"
+        mkdir -p ${POD_OUTPUT}
+        echo "listing current directory contents"
+        ls *
