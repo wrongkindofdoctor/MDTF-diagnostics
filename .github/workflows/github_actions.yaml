@@ -68,7 +68,7 @@ jobs:
       run: |
         echo "POD_OUTPUT=$(echo $PWD/../wkdir/MDTF_NCAR-CAM5.timeslice_2000_2003)" >> $GITHUB_ENV
         echo "POD_OUTPUT is: "
-        echo ${POD_OUTPUT}
+        echo "${POD_OUTPUT}"
     - name: Run diagnostic tests
       run: |
         conda activate _MDTF_base
@@ -87,5 +87,6 @@ jobs:
         cat "${POD_OUTPUT}/example/example.log"
     - name: Run unit tests
       run: |
+        conda activate _MDTF_base
         python -m unittest discover
 
