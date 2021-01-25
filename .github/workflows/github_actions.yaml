@@ -59,23 +59,24 @@ jobs:
         tar -xvf travis_test.tar -C ${PWD}/../ #GH actions double nests the MDTF_diagnostics repo
         mkdir ../wkdir
         echo "Diretories one level up"
-        ls ../*/*
+        ls -R ../*/*
         echo "Directories and files in the current directory:"
         ls # debug
         echo "Available Space"
         df -h # Log space remaining
     - name: Set environment variables
       run: |
-        echo "POD_OUTPUT=$(echo $PWD/../wkdir/MDTF_NCAR-CAM5.timeslice_2000_2004)" >> $GITHUB_ENV
+        echo "POD_OUTPUT=$(echo $PWD/../wkdir/MDTF_NCAR-CAM5.timeslice_2000_2003)" >> $GITHUB_ENV
         echo "POD_OUTPUT is: "
         echo ${POD_OUTPUT}
     - name: Run diagnostic tests
       run: |
+        conda activate _MDTF_base
         cat ./mdtf
         # trivial check that install script worked
         ./mdtf --version
         # try running EOF_500hPa and example PODs
-        ./mdtf -f ${{matrix.json-file}}
+        ./mdtf -v -f ${{matrix.json-file}}
         # EOF_500hPa
         ls ${POD_OUTPUT}/EOF_500hPa/obs
         ls ${POD_OUTPUT}/EOF_500hPa/model
@@ -86,6 +87,5 @@ jobs:
         cat "${POD_OUTPUT}/example/example.log"
     - name: Run unit tests
       run: |
-        conda activate _MDTF_base
         python -m unittest discover
 
