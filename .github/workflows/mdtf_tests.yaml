@@ -15,6 +15,7 @@ defaults:
 jobs:
   build:
     runs-on: ${{matrix.os}}
+    continue-on-error: ${{ matrix.experimental }}
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
@@ -25,16 +26,16 @@ jobs:
         exclude:
           - os: ubuntu-latest
             conda-root: /Users/runner/miniconda3
-          - os: ubuntu-latest 
+          - os: ubuntu-latest
             json-file: "tests/github_actions_test_macos.jsonc"
           - os: macos-latest
             conda-root: /usr/share/miniconda3
-          - os: macos-latest   
+          - os: macos-latest
             json-file: "tests/github_actions_test.jsonc"
           - conda-root: /usr/share/miniconda3
             json-file: "tests/github_actions_test_macos.jsonc"
           - conda-root: /Users/runner/minconda3
-            json-file: "tests/github_actions_test.jsonc" 
+            json-file: "tests/github_actions_test.jsonc"
       max-parallel: 2
     steps:
     - uses: actions/checkout@v2
@@ -46,6 +47,11 @@ jobs:
     - name: Verify miniconda
       run: |
         conda info -a
+    - name: Install XQuartz if macOS
+      if: ${{ matrix.os == 'macos-latest' && matrix.conda-root == '/Users/runner/miniconda3' }}
+      run: |
+        echo "Installing XQuartz"
+        brew install --cask xquartz
     - name: Install dependencies
       run: |
         echo "Available Space"
@@ -60,32 +66,28 @@ jobs:
         tar -xvf travis_test.tar -C ${PWD}/../ #GH actions double nests the MDTF_diagnostics repo
         mkdir ../wkdir
         echo "Diretories one level up"
-        ls ../*/*
+        ls -R ../*/*
         echo "Directories and files in the current directory:"
         ls # debug
         echo "Available Space"
         df -h # Log space remaining
     - name: Set environment variables
       run: |
-        echo "POD_OUTPUT=$(echo $PWD/../wkdir/MDTF_NCAR-CAM5.timeslice_2000_2004)" >> $GITHUB_ENV
-        echo "POD_OUTPUT is: "
-        echo ${POD_OUTPUT}
+        echo "POD_OUTPUT=$(echo $PWD/../wkdir/MDTF_NCAR-CAM5.timeslice_2000_2003)" >> $GITHUB_ENV
     - name: Run diagnostic tests
       run: |
+        conda activate _MDTF_base
+        # confirm POD_OUTPUT directory
+        echo "POD_OUTPUT is: "
+        echo $POD_OUTPUT
         cat ./mdtf
         # trivial check that install script worked
         ./mdtf --version
         # try running EOF_500hPa and example PODs
-        ./mdtf -f ${{matrix.json-file}}
-        # EOF_500hPa 
-        ls ${POD_OUTPUT}/EOF_500hPa/obs
-        ls ${POD_OUTPUT}/EOF_500hPa/model
-        cat "${POD_OUTPUT}/EOF_500hPa/EOF_500hPa.log"
-        # example 
-        ls ${POD_OUTPUT}/example/obs
-        ls ${POD_OUTPUT}/example/model
-        cat "${POD_OUTPUT}/example/example.log"
+        ./mdtf -v -f ${{matrix.json-file}}
     - name: Run unit tests
       run: |
         conda activate _MDTF_base
+        git submodule init
+        git submodule update
         python -m unittest discover
