@@ -22,7 +22,7 @@ jobs:
         conda-root: [/usr/share/miniconda3, /Users/runner/miniconda3]
         json-file: ["tests/github_actions_test.jsonc","tests/github_actions_test_macos.jsonc"]
         # allow other jobs to run if one fails
-        experimental: [true]
+        experimental: [false]
         exclude:
           - os: ubuntu-latest
             conda-root: /Users/runner/miniconda3
@@ -77,10 +77,11 @@ jobs:
         ./scripts/ncar_synthetic.py
         popd
         mkdir wkdir
+        ls */*
         # make input data directories 
-        ./MDTF_diagnostics/tests/make_test_input_data_dir.sh
+        ./MDTF-diagnostics/tests/make_test_input_data_dir.sh
         # Check paths relative to MDTF_diagnostics
-        cd MDTF_diagnostics
+        cd MDTF-diagnostics
         echo "Diretories one level up"
         ls -R ../*/*
         echo "Directories and files in the current directory:"
@@ -95,7 +96,6 @@ jobs:
         echo "POD_OUTPUT is: "
         echo "${POD_OUTPUT}"
         conda activate _MDTF_base
-        cd MDTF_diagnostics
         cat ./mdtf
         # trivial check that install script worked
         ./mdtf --version
