@@ -7,7 +7,7 @@
 // what's listed here.
 //
 // All text to the right of an unquoted "//" is a comment and ignored, as well
-// as blank lines (JSONC quasi-standard.) 
+// as blank lines (JSONC quasi-standard.)
 {
   "case_list" : [
     // The cases below correspond to the different sample model data sets. Note
@@ -16,17 +16,39 @@
     // uncomment the second to run NOAA-GFDL-AM4 only for the MJO_prop_amp POD, 
     // and likewise for the SM_ET_coupling POD.
     {
-      "CASENAME" : "NCAR-CAM5.timeslice",
-      "model" : "NCAR-CAM5",
-      "convention" : "CMIP",
-      "FIRSTYR" : 2000,
-      "LASTYR" : 2004,
+      "CASENAME" : "NCAR.Synthetic",
+      "model" : "CESM",
+      "convention" : "CESM",
+      "FIRSTYR" : 1977,
+      "LASTYR" : 1981,
       "pod_list": [
-        // Optional: PODs to run for this model only (defaults to all)
-        "EOF_500hPa",
-        "example"
-      ]
+          // Optional: PODs to run for this model only (defaults to all)
+          "Wheeler_Kiladis"
+          //"EOF_500hPa",
+         // "MJO_suite",
+         // "MJO_teleconnection",
+         // "convective_transition_diag",
+         //  "precip_diurnal_cycle"
+      ],
+      "CASENAME" : "NCAR-CAM5.timeslice",
+       "model" : "CESM",
+       "convention" : "CMIP",
+       "FIRSTYR" : 2000,
+       "LASTYR" : 2003,
+       "pod_list": ["example"]
     }
+    //{
+    //  "CASENAME" : "NCAR-CAM5.timeslice",
+    //  "model" : "NCAR-CAM5",
+    //  "convention" : "CMIP",
+    //  "FIRSTYR" : 2000,
+     // "LASTYR" : 2003,
+     // "pod_list": [
+        // Optional: PODs to run for this model only (defaults to all)
+     //   "EOF_500hPa",
+     //   "example"
+     // ]
+    //}
   ],
   // PATHS ---------------------------------------------------------------------
   // Location of supporting data downloaded when the framework was installed.
@@ -36,10 +58,12 @@
   // "$" and will be expended to their current values when the framework runs.
 
   // Parent directory containing observational data used by individual PODs.
-  "OBS_DATA_ROOT": "../travis_test/obs_data",
+  //"OBS_DATA_ROOT": "../travis_test/obs_data",
+  "OBS_DATA_ROOT": "../inputdata/test/obs_data",
 
   // Parent directory containing results from different models.
-  "MODEL_DATA_ROOT": "../travis_test/model/",
+  //"MODEL_DATA_ROOT": "../travis_test/model/",
+  "MODEL_DATA_ROOT": "../mdtf_test_data/NCAR.Synthetic",
 
   // Working directory. Defaults to working directory if blank.
   "WORKING_DIR": "../wkdir",
