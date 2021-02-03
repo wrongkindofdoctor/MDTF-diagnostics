@@ -56,7 +56,7 @@ jobs:
       run: |
         echo "Installing Conda Environments"
         # MDTF-specific setup: install all conda envs
-        ./src/conda/conda_env_setup.sh -e MDTF_base --conda_root ${{matrix.conda-root}}
+        ./src/conda/conda_env_setup.sh -e base --conda_root ${{matrix.conda-root}}
         ./src/conda/conda_env_setup.sh -e synthetic_data --conda_root ${{matrix.conda-root}}
     - name: Get Obs and Generate Model Data
       run: |
