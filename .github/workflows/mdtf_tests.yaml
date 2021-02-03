@@ -67,10 +67,11 @@ jobs:
         curl --verbose --ipv4 --connect-timeout 8 --max-time 1200 --retry 128 --ftp-ssl --disable-epsv --ftp-pasv -u "anonymous:anonymous" ftp://ftp.cgd.ucar.edu/archive/mdtf/MDTF_v2.1.a.obs_data.tar --output obs_data.tar
         echo "Untarring test files"
         #tar -xvf travis_test.tar -C ${PWD}/../ #GH actions double nests the MDTF_diagnostics repo
-        tar -xvf input_data.tar -C ${PWD}/../ #GH actions double nests the MDTF_diagnostics repo
+        tar -xvf MDTF_v2.1.a.obs_data.tar -C ${PWD}/../ #GH actions double nests the MDTF_diagnostics repo
         # Defining dependencies in Conda env is faster than pip
         conda activate _env_synthetic_data
         cd ../
+        ls *
         # clone the mdtf_test_data repo
         git clone https://github.com/jkrasting/mdtf_test_data.git
         # install the test data software
