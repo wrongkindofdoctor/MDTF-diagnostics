@@ -124,4 +124,3 @@ jobs:
         git submodule init
         git submodule update
         python -m unittest discover
-
