@@ -120,8 +120,8 @@ jobs:
 
     - name: Run unit tests
       run: |
-        #conda activate _MDTF_base
-        #git submodule init
-        #git submodule update
+        conda activate _MDTF_base
+        git submodule init
+        git submodule update
         python -m unittest discover
 
