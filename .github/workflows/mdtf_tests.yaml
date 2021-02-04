@@ -84,13 +84,14 @@ jobs:
         # Defining dependencies in Conda env is faster than pip
         conda activate _env_synthetic_data
         # install the test data software
-        pushd mdtf_test_data
+        cd mdtf_test_data
         pip install .
         # generate the data
         ./scripts/gfdl_synthetic.py
         ./scripts/ncar_synthetic.py
-        popd
+        cd ../
         mkdir wkdir
+        ls ./*
         # Check paths relative to MDTF_diagnostics
         cd MDTF-diagnostics
         echo "Diretories one level up"
