@@ -23,12 +23,12 @@
       "LASTYR" : 1981,
       "pod_list": [
           // Optional: PODs to run for this model only (defaults to all)
-          "example"
-          "Wheeler_Kiladis"
+         // "example"
+          //"Wheeler_Kiladis"
           //"EOF_500hPa",
          // "MJO_suite",
          // "MJO_teleconnection",
-         // "convective_transition_diag",
+          "convective_transition_diag"
          //  "precip_diurnal_cycle"
       ],
       "CASENAME" : "NCAR-CAM5.timeslice",
@@ -59,7 +59,6 @@
   // "$" and will be expended to their current values when the framework runs.
 
   // Parent directory containing observational data used by individual PODs.
-  //"OBS_DATA_ROOT": "../inputdata/test/obs_data",
   "OBS_DATA_ROOT": "../inputdata/obs_data",
 
   // Parent directory containing results from different models.
