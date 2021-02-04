@@ -21,16 +21,16 @@
       "convention" : "CESM",
       "FIRSTYR" : 1977,
       "LASTYR" : 1981,
-      "pod_list": [
+      "pod_list": ["convective_transition_diag"],
           // Optional: PODs to run for this model only (defaults to all)
          // "example"
           //"Wheeler_Kiladis"
           //"EOF_500hPa",
          // "MJO_suite",
          // "MJO_teleconnection",
-          "convective_transition_diag"
+         // "convective_transition_diag",
          //  "precip_diurnal_cycle"
-      ],
+     // ]
       "CASENAME" : "NCAR-CAM5.timeslice",
        "model" : "CESM",
        "convention" : "CMIP",
