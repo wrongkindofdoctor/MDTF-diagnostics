@@ -79,6 +79,7 @@ jobs:
         ls -R inputdata
     - name: Generate Model Data
       run: |
+        cd ../
         # clone the mdtf_test_data repo
         git clone https://github.com/jkrasting/mdtf_test_data.git
         # Defining dependencies in Conda env is faster than pip
