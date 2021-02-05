@@ -27,9 +27,9 @@
           //"EOF_500hPa",
          // "MJO_suite",
          // "MJO_teleconnection",
-         "convective_transition_diag"
-         //  "precip_diurnal_cycle"
-      ],
+         "convective_transition_diag",
+         "precip_diurnal_cycle"
+      ]
     }
     //{
     //  "CASENAME" : "NCAR-CAM5.timeslice",
