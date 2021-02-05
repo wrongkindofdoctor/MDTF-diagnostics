@@ -23,8 +23,10 @@ To install the MDTF framework, create a directory named ``mdtf`` and unzip the c
 
 - ``diagnostics/``: directory containing source code and documentation of individual PODs.
 - ``doc/``: directory containing documentation (a local mirror of the documentation site).
+- ``shared/``: shared code and resources for use by both the framework and PODs.
+- ``sites/``: site-specific code and configuration files.
 - ``src/``: source code of the framework itself.
-- ``tests/``: unit tests for the framework.
+- ``tests/``: general tests for the framework.
 
 For advanced users interested in keeping more up-to-date on project development and contributing feedback, the ``main`` branch contains features that haven’t yet been incorporated into an official release, which are less stable or thoroughly tested.
 
