@@ -23,6 +23,7 @@
       "LASTYR" : 1981,
       "pod_list": [
           // Optional: PODs to run for this model only (defaults to all)
+        "example",
           //"Wheeler_Kiladis"
           //"EOF_500hPa",
          // "MJO_suite",
