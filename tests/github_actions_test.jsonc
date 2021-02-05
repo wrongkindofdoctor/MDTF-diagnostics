@@ -58,7 +58,7 @@
 
   // Parent directory containing results from different models.
   //"MODEL_DATA_ROOT": "../travis_test/model/",
-  "MODEL_DATA_ROOT": "../mdtf_test_data/NCAR.Synthetic",
+  "MODEL_DATA_ROOT": "../mdtf_test_data",
 
   // Working directory. Defaults to working directory if blank.
   "WORKING_DIR": "../wkdir",

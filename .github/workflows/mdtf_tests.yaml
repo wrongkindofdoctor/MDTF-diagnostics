@@ -108,7 +108,7 @@ jobs:
         df -h # Log space remaining
     - name: Set environment variables
       run: |
-        echo "POD_OUTPUT=$(echo $PWD/../wkdir/MDTF_NCAR-CAM5.timeslice_2000_2003)" >> $GITHUB_ENV
+        echo "POD_OUTPUT=$(echo $PWD/../wkdir/NCAR.Synthetic)" >> $GITHUB_ENV
     - name: Run diagnostic tests
       run: |
         echo "POD_OUTPUT is: "
