@@ -8,7 +8,7 @@ on:
     branches:
       - main
       - develop
-      - feature/github_actions_workflow
+      - test_v3alpha3
 defaults:
   run:
     shell: bash -l {0}
@@ -114,8 +114,8 @@ jobs:
         echo "POD_OUTPUT is: "
         echo "${POD_OUTPUT}"
         conda activate _MDTF_base
-        git submodule init
-        git submodule update
+        #git submodule init
+        #git submodule update
         cat ./mdtf
         # trivial check that install script worked
         ./mdtf --version
@@ -125,6 +125,6 @@ jobs:
     - name: Run unit tests
       run: |
         conda activate _MDTF_base
-        git submodule init
-        git submodule update
+        #git submodule init
+        #git submodule update
         python -m unittest discover
