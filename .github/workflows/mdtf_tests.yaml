@@ -59,6 +59,8 @@ jobs:
         ./src/conda/conda_env_setup.sh -e base --conda_root ${{matrix.conda-root}}
         ./src/conda/conda_env_setup.sh -e python3_base --conda_root ${{matrix.conda-root}}
         ./src/conda/conda_env_setup.sh -e synthetic_data --conda_root ${{matrix.conda-root}}
+        ./src/conda/conda_env_setup.sh -e NCL_base --conda_root ${{matrix.conda-root}}
+        ./src/conda/conda_env_setup.sh -e convective_transition_diag --conda_root ${{matrix.conda-root}}
     - name: Get Observational Data
       run: |
         cd ../
