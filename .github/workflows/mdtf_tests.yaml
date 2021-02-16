@@ -85,7 +85,7 @@ jobs:
         #tar -xvf precip_diurnal_cyle_obs_data.tar -C inputdata
         #tar -xvf MJO_prop_amp_obs_data.tar -C inputdata
         tar -xvf MJO_teleconnection_obs_data.tar -C inputdata
-        ls -R inputdata
+        ls inputdata/obs_data/*/*
         # clean up
         rm -f *.tar
     - name: Generate Model Data
@@ -99,8 +99,8 @@ jobs:
         cd mdtf_test_data
         pip install .
         # generate the data
-        ./scripts/gfdl_synthetic.py
-        #./scripts/ncar_synthetic.py
+        #./scripts/gfdl_synthetic.py
+        ./scripts/ncar_synthetic.py
         cd ../
         mkdir wkdir
         ls ./*
@@ -114,7 +114,7 @@ jobs:
         df -h # Log space remaining
     - name: Set environment variables
       run: |
-        echo "POD_OUTPUT=$(echo $PWD/../wkdir/GFDL.Synthetic)" >> $GITHUB_ENV
+        echo "POD_OUTPUT=$(echo $PWD/../wkdir/NCAR.Synthetic)" >> $GITHUB_ENV
     - name: Run diagnostic tests
       run: |
         echo "POD_OUTPUT is: "
