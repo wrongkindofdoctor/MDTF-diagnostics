@@ -76,8 +76,9 @@ jobs:
         curl --verbose --ipv4 --connect-timeout 8 --max-time 1200 --retry 128 --ftp-ssl --disable-epsv --ftp-pasv -u "anonymous:anonymous" ftp://ftp.gfdl.noaa.gov/pub/jessica.liptak/MJO_teleconnection_obs_data.tar --output MJO_teleconnection_obs_data.tar
         ## make input data directories
         #./MDTF-diagnostics/tests/make_test_input_data_dir.sh
-        ls
-        mkdir inputdata
+        # dummy obs input data directories
+        mkdir -p inputdata/obs_data/EOF_500hPa
+        mkdir -p inputdata/obs_data/example
         echo "Untarring test files"
         #tar -xvf example_obs_data.tar -C inputdata
         #tar -xvf convective_transition_diag_obs_data.tar -C inputdata
