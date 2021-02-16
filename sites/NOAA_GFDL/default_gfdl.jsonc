@@ -15,11 +15,11 @@
   "case_list" : [
     {
       "CASENAME" : "ESM4_historical_D1",
-      "model" : "ESM4",
-      "convention" : "CMIP_GFDL",
-      "FIRSTYR" : 1977,
-      "LASTYR" : 1981,
-      "CASE_ROOT_DIR" : "/archive/cm6/ESM4/DECK/ESM4_historical_D1/gfdl.ncrc4-intel16-prod-openmp/pp",
+      "model" : "GFDL-ESM4",
+      "convention" : "CMIP",
+      "FIRSTYR" : 1996,
+      "LASTYR" : 1999,
+      "CASE_ROOT_DIR" : "/archive/oar.gfdl.cmip6/ESM4/DECK/ESM4_historical_D1/gfdl.ncrc4-intel16-prod-openmp/pp",
       "pod_list": [
           // Optional: PODs to run for this model only (defaults to all)
           "Wheeler_Kiladis",
@@ -79,9 +79,6 @@
   // Method used to fetch model data.
   "data_manager": "GFDL_auto",
 
-  // Method used to preprocess data.
-  "preprocessor": "MDTFData",
-
   // Time (in seconds) to wait before giving up on transferring a data file to 
   // the local filesystem. Set to zero to disable.
   "file_transfer_timeout": 900,
@@ -91,7 +88,7 @@
 
   // RUNTIME -------------------------------------------------------------------
   // Settings affecting the runtime environment of the PODs.
-  "environment_manager": "GFDL_conda",
+  "environment_manager": "conda",
 
   // Path to the Anaconda installation. Only used if environment_manager='Conda'. 
   // Set equal to "" to use conda from your system's $PATH.
@@ -120,9 +117,6 @@
 
   // Set flag to have PODs save netCDF files of processed data.
   "save_nc": false,
-
-  // Set flag to save all processed data except netcdf files.
-  "save_non_nc": false,
 
   // Set flag to save HTML and bitmap plots in a .tar file.
   "make_variab_tar": false,
