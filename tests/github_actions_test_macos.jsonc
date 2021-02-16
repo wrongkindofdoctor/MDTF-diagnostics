@@ -16,9 +16,9 @@
     // uncomment the second to run NOAA-GFDL-AM4 only for the MJO_prop_amp POD,
     // and likewise for the SM_ET_coupling POD.
     {
-      "CASENAME" : "NCAR.Synthetic",
-      "model" : "CESM",
-     "convention" : "CESM",
+      "CASENAME" : "GFL.Synthetic",
+      "model" : "GFDL-Synthetic",
+     "convention" : "CMIP",
       "FIRSTYR" : 1977,
       "LASTYR" : 1981,
       "pod_list": [
