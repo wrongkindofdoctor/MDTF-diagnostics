@@ -22,7 +22,7 @@ def generate_ncl_plots(nclPlotFile):
     # don't exit if it does not exists just print a warning.
     try:
         pipe = subprocess.Popen(['ncl {0}'.format(nclPlotFile)], shell=True, stdout=subprocess.PIPE)
-        output = pipe.communicate()[0]
+        output = pipe.communicate()[0].decode()
         print('NCL routine {0} \n {1}'.format(nclPlotFile,output))            
         while pipe.poll() is None:
             time.sleep(0.5)
@@ -31,21 +31,21 @@ def generate_ncl_plots(nclPlotFile):
 
     return 0
 
-print "Entered "+__file__
+print("Entered "+__file__)
 filename1 = os.environ["ZG_FILE"]
 filename2a = os.environ["ZG_HYBRID_SIGMA_FILE"]
 filename2b = os.environ["PS_FILE"]
-print "Looking for"+filename1
+print("Looking for "+filename1)
 if not os.path.isfile( filename1 ):
-    print ("ERROR missing file "+filename1)
+    print("ERROR missing file "+filename1)
     os.environ['USE_HYBRID_SIGMA'] = "1"
-print "Looking for"+filename2a
+print("Looking for "+filename2a)
 if not os.path.isfile( filename2a ):
-    print ("ERROR missing file "+filename2a)
+    print("ERROR missing file "+filename2a)
     os.environ['USE_HYBRID_SIGMA'] = "0"
-print "Looking for"+filename2b
+print("Looking for "+filename2b)
 if not os.path.isfile( filename2b ):
-    print ("ERROR missing file "+filename2b)
+    print("ERROR missing file "+filename2b)
 
 
 if os.path.isfile(filename1) \

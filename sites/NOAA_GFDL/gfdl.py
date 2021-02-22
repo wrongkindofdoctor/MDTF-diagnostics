@@ -71,7 +71,7 @@ class GFDLMDTFFramework(core.MDTFFramework):
         # clean out WORKING_DIR if we're not keeping temp files:
         if os.path.exists(p.WORKING_DIR) and not \
             (keep_temp or p.WORKING_DIR == p.OUTPUT_DIR):
-            shutil.rmtree(p.WORKING_DIR)
+            gfdl_util.rmtree_wrapper(p.WORKING_DIR)
         util.check_dirs(p.CODE_ROOT, p.OBS_DATA_REMOTE, create=False)
         util.check_dirs(p.MODEL_DATA_ROOT, p.OBS_DATA_ROOT, p.WORKING_DIR, 
             create=True)
@@ -116,21 +116,6 @@ class GfdlDiagnostic(diagnostic.Diagnostic):
                     self.exceptions.log(chained_exc)    
 
 # ------------------------------------------------------------------------
-
-def GfdlautoDataManager(case_dict):
-    """Wrapper for dispatching DataManager based on inputs.
-    """
-    test_root = case_dict.get('CASE_ROOT_DIR', None)
-    if not test_root:
-        return GFDL_UDA_CMIP6DataSourceAttributes(case_dict)
-    test_root = os.path.normpath(test_root)
-    if 'pp' in os.path.basename(test_root):
-        return GfdlppDataManager(case_dict)
-    else:
-        _log.critical(("ERROR: Couldn't determine data fetch method from input."
-            "Please set '--data_manager GFDL_pp', 'GFDL_UDA_CMP6', or "
-            "'GFDL_data_cmip6', depending on the source you want."))
-        exit(1)
 
 class GCPFetchMixin(data_manager.AbstractFetchMixin):
     """Mixin implementing data fetch for netcdf files on filesystems accessible
@@ -428,12 +413,32 @@ class GfdlppDataManager(GFDL_GCP_FileDataSourceBase):
 
     daterange_col = "date_range"
     # Catalog columns whose values must be the same for all variables.
-    expt_cols = tuple()
-    # Catalog columns whose values must be the same for each POD.
-    pod_expt_cols = ('component', )
-    # Catalog columns whose values must "be the same for each variable", ie are 
-    # irrelevant but must be constrained to a unique value.
-    var_expt_cols = ("chunk_freq", )
+    expt_key_cols = tuple()
+    expt_cols = expt_key_cols
+
+    def __init__(self, case_dict):
+        super(GfdlppDataManager, self).__init__(case_dict)
+        config = core.ConfigManager()
+        self.any_components = config.get('any_components', False)
+
+    @property
+    def pod_expt_key_cols(self):
+        return (tuple() if self.any_components else ('component', ))
+
+    @property
+    def pod_expt_cols(self):
+        # Catalog columns whose values must be the same for each POD.
+        return self.pod_expt_key_cols
+
+    @property
+    def var_expt_key_cols(self):
+        return (('chunk_freq', 'component') if self.any_components else ('chunk_freq', ))
+
+    @property
+    def var_expt_cols(self):
+        # Catalog columns whose values must "be the same for each variable", ie  
+        # are irrelevant but must be constrained to a unique value.
+        return self.var_expt_key_cols
 
     @property
     def CATALOG_DIR(self):
@@ -493,7 +498,9 @@ class GfdlppDataManager(GFDL_GCP_FileDataSourceBase):
             else:
                 return _heuristic_tiebreaker_sub(str_list)
 
-        df = self._filter_column(df, 'component', _heuristic_tiebreaker, obj.name)
+        if 'component' in self.pod_expt_cols:
+            df = self._filter_column(df, 'component', _heuristic_tiebreaker, obj.name)
+        # otherwise no-op
         return df
 
     def resolve_var_expt(self, df, obj):
@@ -503,7 +510,41 @@ class GfdlppDataManager(GFDL_GCP_FileDataSourceBase):
             outside of the query date range.
         """
         df = self._filter_column_min(df, obj.name, 'chunk_freq')
+        if 'component' in self.var_expt_cols:
+            col_name = 'component'
+            df = df.sort_values(col_name).iloc[[0]]
+            _log.debug("Selected experiment attribute '%s'='%s' for %s.", 
+                col_name, df[col_name].iloc[0], obj.name)
         return df
+
+class GfdlautoDataManager(object):
+    """Wrapper for dispatching DataManager based on user input. If CASE_ROOT_DIR
+    ends in "pp", use :class:`GfdlppDataManager`, otherwise use CMIP6 data on
+    /uda via :class:`Gfdludacmip6DataManager`.
+    """
+    def __new__(cls, case_dict, *args, **kwargs):
+        """Dispatch DataManager instance creation based on the contents of 
+        case_dict."""
+        config = core.ConfigManager()
+        dir_ = case_dict.get('CASE_ROOT_DIR', config.CASE_ROOT_DIR)
+        if 'pp' in os.path.basename(os.path.normpath(dir_)):
+            dispatched_cls = GfdlppDataManager
+        else:
+            dispatched_cls = Gfdludacmip6DataManager
+            # _log.critical(("%s: Couldn't determine data fetch method from input."
+            #     "Please set '--data_manager GFDL_pp', 'GFDL_UDA_cmip6', or "
+            #     "'GFDL_data_cmip6', depending on the source you want."),
+            #     cls.__name__)
+            # exit(2)
+            
+        _log.debug("%s: Dispatched DataManager to %s.", 
+            cls.__name__, dispatched_cls.__name__)
+        obj = dispatched_cls.__new__(dispatched_cls)
+        obj.__init__(case_dict)
+        return obj
+
+    def __init__(self, *args, **kwargs):
+        pass
 
 # ------------------------------------------------------------------------
 
@@ -675,7 +716,7 @@ class GFDLHTMLOutputManager(output_manager.HTMLOutputManager):
                 if self.overwrite:
                     try:
                         _log.error('%s exists, attempting to remove.', self.OUT_DIR)
-                        shutil.rmtree(self.OUT_DIR)
+                        gfdl_util.rmtree_wrapper(self.OUT_DIR)
                     except OSError:
                         # gcp will not overwrite dirs, so forced to save under
                         # a different name despite overwrite=True
@@ -697,4 +738,4 @@ class GFDLHTMLOutputManager(output_manager.HTMLOutputManager):
             except Exception:
                 raise # only delete MODEL_WK_DIR if copied successfully
             _log.debug('Transfer succeeded; deleting directory %s', self.WK_DIR)
-            shutil.rmtree(self.WK_DIR)
+            gfdl_util.rmtree_wrapper(self.WK_DIR)

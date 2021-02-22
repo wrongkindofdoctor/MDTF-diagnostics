@@ -24,6 +24,9 @@ lon_coord = getenv("lon_coord")
 lev_coord = getenv("lev_coord")
 file_path = getenv("DATADIR")
 
+print("IS LOG SHIT WORKING")
+print(use_hybrid_sigma)
+
 ; Z500 
 if( fileexists(wk_dir+"/model/netCDF/"+casename+".Z500.ANOMS.nc") ) then
 
@@ -107,8 +110,12 @@ if (use_hybrid_sigma) then
    hybm = f_zg->$hybm_var$
    z = f_zg->$zg_var$($time_coord$|i1:i2,$lev_coord$|:,$lat_coord$|:,$lon_coord$|:)
    ps = f_ps->$ps_var$($time_coord$|i1:i2,$lat_coord$|:,$lon_coord$|:)
-   z500 = vinth2p(z,hyam,hybm,500.,ps,2,1000.,1,False) ; (time,plev,lat,lon)
+   z500_4D = vinth2p(z,hyam,hybm,500.,ps,2,1000.,1,False) ; (time,plev,lat,lon)
+   ; level dimension is now degenerate (length 1), so drop it to get 3D data
+   z500_dims = dimsizes(z500_4D)
+   z500 = reshape(z500_4D, (/z500_dims(0), z500_dims(2), z500_dims(3)/))
    delete (z)
+   delete (z500_4D)
    delete (ps)
 else
    rank = dimsizes( filevardimsizes(f_zg,zg_var) )
@@ -121,7 +128,7 @@ else
 end if
 ; end TSJ edit
 
-anom = (/rmMonAnnCycTLL(z500(:,0,:,:))/)
+anom = (/rmMonAnnCycTLL(z500(:,:,:))/)
 delete (z500)
 n = 11
 do yr = firstyr+1,lastyr
