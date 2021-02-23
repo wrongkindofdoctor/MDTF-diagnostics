@@ -15,18 +15,33 @@
     // models in a single invocation. Comment out or delete the first entry and
     // uncomment the second to run NOAA-GFDL-AM4 only for the MJO_prop_amp POD,
     // and likewise for the SM_ET_coupling POD.
+    //{
+    //  "CASENAME" : "GFDL.Synthetic",
+    //  "model" : "GFDL-Synthetic",
+    // "convention" : "GFDL",
+    //  "FIRSTYR" : 1,
+    //  "LASTYR" : 10,
+    //  "pod_list": [
+    //      // Optional: PODs to run for this model only (defaults to all)
+    //      "MJO_prop_amp"
+    //  ]
+    //}
+  //],
     {
-      "CASENAME" : "GFDL.Synthetic",
-      "model" : "GFDL-Synthetic",
-     "convention" : "GFDL",
-      "FIRSTYR" : 1,
-      "LASTYR" : 10,
+      "CASENAME" : "NCAR.Synthetic",
+      "convention" : "NCAR",
+      "FIRSTYR" : 1975,
+      "LASTYR" : 1981,
       "pod_list": [
           // Optional: PODs to run for this model only (defaults to all)
-          "MJO_prop_amp"
-      ]
-    }
-  ],
+        "Wheeler_Kiladis",
+        "EOF_500hPa",
+        "MJO_suite",
+        "MJO_teleconnection",
+        "convective_transition_diag"
+        ]
+      }
+    ],
   // PATHS ---------------------------------------------------------------------
   // Location of supporting data downloaded when the framework was installed.
 
