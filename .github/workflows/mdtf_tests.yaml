@@ -76,7 +76,7 @@ jobs:
         curl --verbose --ipv4 --connect-timeout 8 --max-time 1200 --retry 128 --ftp-ssl --disable-epsv --ftp-pasv -u "anonymous:anonymous" ftp://ftp.gfdl.noaa.gov/pub/jessica.liptak/MJO_teleconnection_obs_data.tar --output MJO_teleconnection_obs_data.tar
         curl --verbose --ipv4 --connect-timeout 8 --max-time 1200 --retry 128 --ftp-ssl --disable-epsv --ftp-pasv -u "anonymous:anonymous" ftp://ftp.gfdl.noaa.gov/pub/jessica.liptak/MJO_suite_obs_data.tar --output MJO_suite_obs_data.tar
         curl --verbose --ipv4 --connect-timeout 8 --max-time 1200 --retry 128 --ftp-ssl --disable-epsv --ftp-pasv -u "anonymous:anonymous" ftp://ftp.gfdl.noaa.gov/pub/jessica.liptak/Wheeler_Kiladis_obs_data.tar --output Wheeler_Kiladis_obs_data.tar
-        curl --verbose --ipv4 --connect-timeout 8 --max-time 1200 --retry 128 --ftp-ssl --disable-epsv --ftp-pasv -u "anonymous:anonymous" ftp://ftp.gfdl.noaa.gov/pub/jessica.liptak/MJO_prop_amp_obs_data.tar --output MJO_prob_amp_obs_data.tar
+        #curl --verbose --ipv4 --connect-timeout 8 --max-time 1200 --retry 128 --ftp-ssl --disable-epsv --ftp-pasv -u "anonymous:anonymous" ftp://ftp.gfdl.noaa.gov/pub/jessica.liptak/MJO_prop_amp_obs_data.tar --output MJO_prob_amp_obs_data.tar
         ## make input data directories
         #./MDTF-diagnostics/tests/make_test_input_data_dir.sh
         # dummy obs input data directories
@@ -85,7 +85,7 @@ jobs:
         #tar -xvf example_obs_data.tar -C inputdata
         #tar -xvf precip_diurnal_cyle_obs_data.tar -C inputdata
         tar -xvf convective_transition_diag_obs_data.tar -C inputdata
-        tar -xvf MJO_prop_amp_obs_data.tar -C inputdata
+        #tar -xvf MJO_prop_amp_obs_data.tar -C inputdata
         tar -xvf MJO_teleconnection_obs_data.tar -C inputdata
         tar -xvf MJO_suite_obs_data.tar -C inputdata
         tar -xvf Wheeler_Kiladis_obs_data.tar -C inputdata
