@@ -5,7 +5,7 @@ Specifications for the above were taken from the planning document
 CMIP6 controlled vocabularies (lists of registered MIPs, modeling centers, etc.)
 are derived from data in the 
 `PCMDI/cmip6-cmor-tables <https://github.com/PCMDI/cmip6-cmor-tables>`__ 
-repo, which is included as a submodule.
+repo, which is included as a subtree under ``/data``.
 
 .. warning::
    Functionality here has been added as needed for the project and is incomplete,
@@ -14,7 +14,7 @@ repo, which is included as a submodule.
 import os
 import re
 import dataclasses as dc
-from src import datelabel, util, core
+from src import util, core
 
 import logging
 _log = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ class CMIP6_CVs(util.Singleton):
             file_ = 'dummy_filename'
         else:
             paths = core.PathManager()
-            file_ = os.path.join(paths.CODE_ROOT, 'src', 
+            file_ = os.path.join(paths.CODE_ROOT, 'data', 
                 'cmip6-cmor-tables','Tables','CMIP6_CV.json')
         self._contents = util.read_json(file_)
         self._contents = self._contents['CV']
@@ -165,8 +165,8 @@ class CMIP6_CVs(util.Singleton):
             if tbl_d.get('frequency', None) == frequency]
 
 
-class CMIP6DateFrequency(datelabel.DateFrequency):
-    """Subclass of :class:`datelabel.DateFrequency` to parse data frequency
+class CMIP6DateFrequency(util.DateFrequency):
+    """Subclass of :class:`src.util.datelabel.DateFrequency` to parse data frequency
     information as encoded in MIP tables, DRS filenames, etc.
 
     Extends DateFrequency in that this records if the data is a climatological
@@ -408,7 +408,7 @@ class CMIP6_DRSDirectory(CMIP6_VariantLabel, CMIP6_MIPTable, CMIP6_GridLabel):
     variant_label: CMIP6_VariantLabel = ""
     table_id: CMIP6_MIPTable = ""
     grid_label: CMIP6_GridLabel = ""
-    version_date: datelabel.Date = None
+    version_date: util.Date = None
 
 _drs_dates_filename_regex = util.RegexPattern(r"""
         (?P<variable_id>\w+)_       # field name
@@ -430,7 +430,7 @@ _drs_static_filename_regex = util.RegexPattern(r"""
         (?P<grid_label>\w+)
         \.nc                      # netCDF file extension, no dates
     """,
-    defaults={'start_date': datelabel.FXDateMin, 'end_date': datelabel.FXDateMax},
+    defaults={'start_date': util.FXDateMin, 'end_date': util.FXDateMax},
 )
 drs_filename_regex = util.ChainedRegexPattern(
     # try the first regex, and if no match, try second
@@ -452,21 +452,21 @@ class CMIP6_DRSFilename(CMIP6_VariantLabel, CMIP6_MIPTable, CMIP6_GridLabel):
     experiment_id: str = ""
     variant_label: CMIP6_VariantLabel = ""
     grid_label: CMIP6_GridLabel = ""
-    start_date: datelabel.Date = None
-    end_date: datelabel.Date = None
-    date_range: datelabel.DateRange = dc.field(init=False)
+    start_date: util.Date = None
+    end_date: util.Date = None
+    date_range: util.DateRange = dc.field(init=False)
 
     def __post_init__(self, *args):
-        if self.start_date == datelabel.FXDateMin \
-            and self.end_date == datelabel.FXDateMax:
+        if self.start_date == util.FXDateMin \
+            and self.end_date == util.FXDateMax:
             # Assume we're dealing with static/fx-frequency data, so use special 
             # placeholder values
-            self.date_range = datelabel.FXDateRange
+            self.date_range = util.FXDateRange
             if not self.frequency.is_static: # frequency inferred from table_id
                 raise util.DataclassParseError(("Inconsistent filename parse: "
                     f"cannot determine if '{self.filename}' represents static data."))
         else:
-            self.date_range = datelabel.DateRange(self.start_date, self.end_date)
+            self.date_range = util.DateRange(self.start_date, self.end_date)
             if self.frequency.is_static: # frequency inferred from table_id
                 raise util.DataclassParseError(("Inconsistent filename parse: "
                     f"cannot determine if '{self.filename}' represents static data."))

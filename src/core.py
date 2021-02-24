@@ -9,7 +9,8 @@ import shutil
 import signal
 import tempfile
 import traceback
-from src import util, cli, mdtf_info, data_model
+from src import util, cli, mdtf_info, data_model, units
+from src.units import Units
 
 import logging
 _log = logging.getLogger(__name__)
@@ -196,13 +197,15 @@ class MDTFFramework(object):
         pass
 
     def _print_config(self, cli_obj, config, paths):
-        # make config nested dict for backwards compatibility
-        # this is all temporary
+        """Log end result of parsing package settings. This is only for the user's
+        benefit; a machine-readable version which is usable for 
+        provenance/reproducibilityis saved by the OutputManager as 
+        config_save.jsonc.
+        """
         d = dict()
         for n, case in enumerate(self.case_list):
             key = 'case_list({})'.format(n)
             d[key] = case
-        # d['pod_list'] = self.pod_list
         d['paths'] = paths.toDict()
         d['paths'].pop('_unittest', None)
         d['settings'] = dict()
@@ -215,8 +218,8 @@ class MDTFFramework(object):
         d['settings'] = {k:v for k,v in d['settings'].items() \
             if k not in d['paths']}
         d['env_vars'] = config.global_env_vars
-        print('DEBUG: SETTINGS:')
-        print(util.pretty_print_json(d))
+        _log.info('PACKAGE SETTINGS:')
+        _log.info(util.pretty_print_json(d))
 
     # --------------------------------------------------------------------
 
@@ -234,30 +237,29 @@ class MDTFFramework(object):
         return False
 
     def main(self):
-        _log.info("\n======= Starting %s", __file__)
         # only run first case in list until dependence on env vars cleaned up
         for case_d in self.case_list[0:1]:
             case_name = case_d.get('CASENAME', '<untitled>')
-            _log.info(f"Framework: initialize {case_name}")
+            _log.info(f"### Framework: initialize {case_name}")
             case = self.DataSource(case_d)
             case.setup()
             self.cases.append(case)
 
             if not case.failed:
-                _log.info(f'Framework: request data for {case_name}')
+                _log.info(f'### Framework: request data for {case_name}')
                 case.request_data()
             else:
-                _log.info((f"Framework: initialization for {case_name} failed, skipping "
+                _log.info((f"### Framework: initialization for {case_name} failed, skipping "
                     f"data request."))
 
             if not case.failed:
-                _log.info(f'Framework: run {case_name}')
+                _log.info(f'### Framework: run {case_name}')
                 run_mgr = self.RuntimeManager(case.pods, self.EnvironmentManager)
                 run_mgr.setup()
                 run_mgr.run()
                 run_mgr.tear_down()
             else:
-                _log.info((f"Framework: Data request for {case_name} failed, "
+                _log.info((f"### Framework: Data request for {case_name} failed, "
                     f"skipping execution."))
 
             out_mgr = self.OutputManager(case)
@@ -439,8 +441,7 @@ class TranslatedVarlistEntry(data_model.DMVariable):
         dc.field(default=util.MANDATORY, metadata={'query': True})
     standard_name: str = \
         dc.field(default=util.MANDATORY, metadata={'query': True})
-    units: util.Units = util.MANDATORY
-    # axes_set: frozenset = dc.field(default_factory=frozenset)
+    units: Units = util.MANDATORY
     scalar_coords: list = \
         dc.field(init=False, default_factory=list, metadata={'query': True})
 
@@ -450,7 +451,7 @@ class FieldlistEntry(data_model.DMDependentVariable):
     """
     # name: str             # fields inherited from DMDependentVariable
     # standard_name: str
-    # units: util.Units
+    # units: Units
     # dims: list            # fields inherited from _DMDimensionsMixin
     # scalar_coords: list
     scalar_coord_templates: dict = dc.field(default_factory=dict)
@@ -519,7 +520,7 @@ class FieldlistEntry(data_model.DMDependentVariable):
         # construct convention's name for this variable on a level
         name_template = self.scalar_coord_templates[key]
         new_name = name_template.format(value=int(new_coord.value))
-        if util.units_equal(c.units, new_coord.units):
+        if units.units_equal(c.units, new_coord.units):
             _log.debug("Renaming %s %s %s slice of '%s' to '%s'.",
                 c.value, c.units, c.axis, self.name, new_name)
         else:
@@ -532,7 +533,7 @@ class FieldlistEntry(data_model.DMDependentVariable):
 @util.mdtf_dataclass
 class Fieldlist():
     """Class corresponding to a single variable naming convention (single file
-    in src/data/fieldlist_*.jsonc).
+    in data/fieldlist_*.jsonc).
 
     TODO: implement more robust indexing/lookup scheme. standard_name is not
     a unique identifier, but should include cell_methods, etc. as well as
@@ -649,7 +650,7 @@ class Fieldlist():
         
         if hasattr(coord, 'is_scalar') and coord.is_scalar:
             new_coord = copy.deepcopy(new_coord)
-            new_coord.value = util.convert_scalar_coord(coord, new_coord.units)
+            new_coord.value = units.convert_scalar_coord(coord, new_coord.units)
         else:
             new_coord = dc.replace(coord, 
                 **(util.filter_dataclass(new_coord, coord)))
@@ -690,7 +691,7 @@ class Fieldlist():
 
 class VariableTranslator(util.Singleton):
     """:class:`~util.Singleton` containing information for different variable 
-    naming conventions. These are defined in the src/data/fieldlist_*.jsonc 
+    naming conventions. These are defined in the data/fieldlist_*.jsonc 
     files.
     """
     def __init__(self, code_root=None, unittest=False):
@@ -703,7 +704,7 @@ class VariableTranslator(util.Singleton):
             config_files = []
         else:
             glob_pattern = os.path.join(
-                code_root, 'src', 'data', 'fieldlist_*.jsonc'
+                code_root, 'data', 'fieldlist_*.jsonc'
             )
             config_files = glob.glob(glob_pattern)
         for f in config_files:

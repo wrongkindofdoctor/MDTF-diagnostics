@@ -3,12 +3,10 @@ import unittest
 from src.util import exceptions
 import src.cmip6 as cmip6
 from src.cmip6 import CMIP6DateFrequency as dt_freq
-import src.datelabel as dl
+from src.util import datelabel as dl
 from src.tests.shared_test_utils import setUp_config_singletons, tearDown_config_singletons
 
 # really incomplete! Do more systematically.
-#@unittest.skipIf(True,
-#    "Skipping TestCMIP6_CVs since we don't want to read in the json")
 class TestCMIP6_CVs(unittest.TestCase):
     def setUp(self):
         setUp_config_singletons()

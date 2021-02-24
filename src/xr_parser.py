@@ -6,11 +6,11 @@ import itertools
 import re
 import warnings
 
-import cftime
+import cftime # believe explict import needed for cf_xarray date parsing?
 import cf_xarray
 import xarray as xr
 
-from src import util
+from src import util, units
 
 import logging
 _log = logging.getLogger(__name__)
@@ -320,8 +320,6 @@ class DatasetParser():
                 expected_val, name)
         if test_count >= 1:
             return expected_val
-        # _log.warning("Expected value of '%s' for '%s' not found.", 
-        #     expected_val, name)
         munged_opts = [
             (comparison_func(str_munge(opt), str_munge(expected_val)), opt) \
                 for opt in options
@@ -332,11 +330,8 @@ class DatasetParser():
                 expected_val, guessed_val, name)
             return guessed_val
         if default is None:
-            # _log.debug("No string similar to '%s' in %s.", name, options)
             raise KeyError(expected_val)
         else:
-            # _log.error("Failed to parse '%s'; using fallback value '%s'.", 
-            #     name, default)
             return default
 
     def normalize_attr(self, key_name, key_startswith, d, default=None, update=True):
@@ -416,7 +411,6 @@ class DatasetParser():
         def _restore_one(name, backup_d, attrs_d):
             for k,v in backup_d.items():
                 if k not in attrs_d:
-                    # _log.debug("%s: restore attr '%s' = '%s'.", name, k, v)
                     attrs_d[k] = v
                 if v != attrs_d[k]:
                     _log.debug("%s: discrepancy for attr '%s': '%s' != '%s'.",
@@ -548,16 +542,16 @@ class DatasetParser():
             if hasattr(var_, attr_name):
                 # cleanup placeholder attr if our var was altered
                 var_.value, new_units = getattr(var_, attr_name)
-                var_.units = util.to_cfunits(new_units)
+                var_.units = units.to_cfunits(new_units)
                 _log.debug("Updated (value, units) of '%s' to (%s, %s).",
                     var_.name, var_.value, var_.units)
                 delattr(var_, attr_name)
 
         assert ds_var.size == 1
         if equivalent:
-            comparison_func = util.units_equivalent
+            comparison_func = units.units_equivalent
         else:
-            comparison_func = (lambda x,y: util.units_equal(x,y, rtol=1.0e-5))
+            comparison_func = (lambda x,y: units.units_equal(x,y, rtol=1.0e-5))
         
         our_attr = (our_var.value, our_var.units)
         ds_attr = (float(ds_var), ds_var.attrs.get('units', ''))
@@ -602,7 +596,7 @@ class DatasetParser():
             self.check_scalar_coord_value(our_var, ds_var, equivalent=True)
         else:
             self.check_attr(our_var, ds_var, 'units', 
-                comparison_func=util.units_equivalent,
+                comparison_func=units.units_equivalent,
                 update_our_var=True, update_ds=True
         )
         # now check equality of units - not an error, since we can convert
@@ -613,12 +607,12 @@ class DatasetParser():
             else:
                 # test units only, not quantities+units
                 self.check_attr(our_var, ds_var, 'units', 
-                    comparison_func=util.units_equal, 
+                    comparison_func=units.units_equal, 
                     update_our_var=True, update_ds=True
                 )
         except TypeError as exc:
             _log.warning(exc)
-            our_var.units = util.to_cfunits(our_var.units)
+            our_var.units = units.to_cfunits(our_var.units)
 
     def check_variable(self, ds, translated_var):
         """Top-level method for the MDTF-specific dataset validation: attempts to
