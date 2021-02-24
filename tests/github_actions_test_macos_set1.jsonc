@@ -1,4 +1,4 @@
-// Configuration for MDTF-diagnostics driver script self-test.
+// Configuration for MDTF-diagnostics driver script self-test using the macOS github action.
 //
 // Copy this file and customize the settings as needed to run the framework on
 // your own model output without repeating command-line options. Pass it to the
@@ -15,6 +15,18 @@
     // models in a single invocation. Comment out or delete the first entry and
     // uncomment the second to run NOAA-GFDL-AM4 only for the MJO_prop_amp POD,
     // and likewise for the SM_ET_coupling POD.
+    //{
+    //  "CASENAME" : "GFDL.Synthetic",
+    //  "model" : "GFDL-Synthetic",
+    // "convention" : "GFDL",
+    //  "FIRSTYR" : 1,
+    //  "LASTYR" : 10,
+    //  "pod_list": [
+    //      // Optional: PODs to run for this model only (defaults to all)
+    //      "MJO_prop_amp"
+    //  ]
+    //}
+  //],
     {
       "CASENAME" : "NCAR.Synthetic",
       "convention" : "NCAR",
@@ -23,25 +35,13 @@
       "pod_list": [
           // Optional: PODs to run for this model only (defaults to all)
         "Wheeler_Kiladis",
-        "EOF_500hPa",
+        //"EOF_500hPa",
         "MJO_suite",
         "MJO_teleconnection",
         "convective_transition_diag"
-      ]
-    }
-    //{
-    //  "CASENAME" : "NCAR-CAM5.timeslice",
-    //  "model" : "NCAR-CAM5",
-    //  "convention" : "CMIP",
-    //  "FIRSTYR" : 2000,
-     // "LASTYR" : 2003,
-     // "pod_list": [
-        // Optional: PODs to run for this model only (defaults to all)
-     //   "EOF_500hPa",
-     //   "example"
-     // ]
-    //}
-  ],
+        ]
+      }
+    ],
   // PATHS ---------------------------------------------------------------------
   // Location of supporting data downloaded when the framework was installed.
 
@@ -50,7 +50,6 @@
   // "$" and will be expended to their current values when the framework runs.
 
   // Parent directory containing observational data used by individual PODs.
-  //"OBS_DATA_ROOT": "../travis_test/obs_data",
   "OBS_DATA_ROOT": "../inputdata/obs_data",
 
   // Parent directory containing results from different models.
@@ -67,13 +66,13 @@
   // Location of the Anaconda/miniconda installation to use for managing
   // dependencies (path returned lsby running `conda info --base`.) If empty,
   // framework will attempt to determine location of system's conda installation.
-  "conda_root": "/usr/share/miniconda3",
+  "conda_root": "/Users/runner/miniconda3",
 
   // Directory containing the framework-specific conda environments. This should
   // be equal to the "--env_dir" flag passed to conda_env_setup.sh. If left
   // blank, the framework will look for its environments in the system default
   // location.
-  "conda_env_root": "/usr/share/miniconda3/envs",
+  "conda_env_root": "/Users/runner/miniconda3/envs",
 
   // SETTINGS ------------------------------------------------------------------
   // Any command-line option recognized by the mdtf script (type `mdtf --help`)
