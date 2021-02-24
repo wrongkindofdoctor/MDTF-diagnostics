@@ -88,6 +88,8 @@ jobs:
         ls
     - name: Get Observational Data for Set 1
       run: |
+        echo "${PWD}"
+        cd ../
         echo "Available Space"
         df -h
         # attempt FTP data fetch
@@ -114,9 +116,10 @@ jobs:
         rm -f *.tar
     - name: Run diagnostic tests set 1
       run: |
+        echo "${PWD}"
         echo "POD_OUTPUT is: "
         echo "${POD_OUTPUT}"
-        cd MDTF-diagnostics
+        #cd MDTF-diagnostics
         conda activate _MDTF_base
         cat ./mdtf
         # trivial check that install script worked
