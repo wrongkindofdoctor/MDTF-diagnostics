@@ -137,7 +137,7 @@ jobs:
         # attempt FTP data fetch
         # allow 20 min for transfer before timeout; Github actions allows 6 hours for individual
         # jobs, but we don't want to max out resources that are shared by the NOAA-GFDL repos.
-        curl --verbose --ipv4 --connect-timeout 8 --max-time 1200 --retry 128 --ftp-ssl --disable-epsv --ftp-pasv -u "anonymous:anonymous" ftp://ftp.gfdl.noaa.gov/pub/jessica.liptak/MJO_prop_amp_obs_data.tar --output MJO_prob_amp_obs_data.tar
+        curl --verbose --ipv4 --connect-timeout 8 --max-time 1200 --retry 128 --ftp-ssl --disable-epsv --ftp-pasv -u "anonymous:anonymous" ftp://ftp.gfdl.noaa.gov/pub/jessica.liptak/MJO_prop_amp_obs_data.tar --output MJO_prop_amp_obs_data.tar
         echo "Untarring set 2 test files"
         tar -xvf MJO_prop_amp_obs_data.tar -C inputdata
         ls inputdata/obs_data/*/*
