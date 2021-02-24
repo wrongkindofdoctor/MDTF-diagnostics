@@ -37,8 +37,8 @@
         "Wheeler_Kiladis",
         //"EOF_500hPa",
         "MJO_suite",
-        "MJO_teleconnection",
-        "convective_transition_diag"
+        "MJO_teleconnection"
+        //"convective_transition_diag"
         ]
       }
     ],

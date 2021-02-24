@@ -96,7 +96,7 @@ jobs:
         # allow 20 min for transfer before timeout; Github actions allows 6 hours for individual
         # jobs, but we don't want to max out resources that are shared by the NOAA-GFDL repos.
         #curl --verbose --ipv4 --connect-timeout 8 --max-time 1200 --retry 128 --ftp-ssl --disable-epsv --ftp-pasv -u "anonymous:anonymous" ftp://ftp.gfdl.noaa.gov/pub/jessica.liptak/example_obs_data.tar --output example_obs_data.tar
-        curl --verbose --ipv4 --connect-timeout 8 --max-time 1200 --retry 128 --ftp-ssl --disable-epsv --ftp-pasv -u "anonymous:anonymous" ftp://ftp.gfdl.noaa.gov/pub/jessica.liptak/convective_transition_diag_obs_data.tar --output convective_transition_diag_obs_data.tar
+        #curl --verbose --ipv4 --connect-timeout 8 --max-time 1200 --retry 128 --ftp-ssl --disable-epsv --ftp-pasv -u "anonymous:anonymous" ftp://ftp.gfdl.noaa.gov/pub/jessica.liptak/convective_transition_diag_obs_data.tar --output convective_transition_diag_obs_data.tar
         curl --verbose --ipv4 --connect-timeout 8 --max-time 1200 --retry 128 --ftp-ssl --disable-epsv --ftp-pasv -u "anonymous:anonymous" ftp://ftp.gfdl.noaa.gov/pub/jessica.liptak/Wheeler_Kiladis_obs_data.tar --output Wheeler_Kiladis_obs_data.tar
         curl --verbose --ipv4 --connect-timeout 8 --max-time 1200 --retry 128 --ftp-ssl --disable-epsv --ftp-pasv -u "anonymous:anonymous" ftp://ftp.gfdl.noaa.gov/pub/jessica.liptak/MJO_teleconnection_obs_data.tar --output MJO_teleconnection_obs_data.tar
         curl --verbose --ipv4 --connect-timeout 8 --max-time 1200 --retry 128 --ftp-ssl --disable-epsv --ftp-pasv -u "anonymous:anonymous" ftp://ftp.gfdl.noaa.gov/pub/jessica.liptak/MJO_suite_obs_data.tar --output MJO_suite_obs_data.tar
@@ -109,9 +109,9 @@ jobs:
         #tar -xvf precip_diurnal_cyle_obs_data.tar -C inputdata
         tar -xvf MJO_teleconnection_obs_data.tar -C inputdata
         tar -xvf MJO_suite_obs_data.tar -C inputdata
-        tar -xvf convective_transition_diag_obs_data.tar -C inputdata
+        #tar -xvf convective_transition_diag_obs_data.tar -C inputdata
         tar -xvf Wheeler_Kiladis_obs_data.tar -C inputdata
-        ls inputdata/obs_data/*/*
+        #ls inputdata/obs_data/*/*
         # clean up tarballs
         rm -f *.tar
     - name: Run diagnostic tests set 1
@@ -119,7 +119,6 @@ jobs:
         echo "${PWD}"
         echo "POD_OUTPUT is: "
         echo "${POD_OUTPUT}"
-        #cd MDTF-diagnostics
         conda activate _MDTF_base
         cat ./mdtf
         # trivial check that install script worked
@@ -146,7 +145,7 @@ jobs:
         rm -f *.tar
     - name: Run diagnostic tests set 2
       run: |
-        cd MDTF-diagnostics
+        echo "${PWD}"
         conda activate _MDTF_base
         cat ./mdtf
         # trivial check that install script worked
