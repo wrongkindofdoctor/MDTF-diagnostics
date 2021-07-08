@@ -31,12 +31,11 @@ RUN conda install -c conda-forge mamba
 ENV CODE_ROOT=/proj/MDTF-diagnostics
 COPY src ${CODE_ROOT}/src
 COPY data ${CODE_ROOT}/data
-COPY diagnostics ${CODE_ROOT}/diagnostics
+#COPY diagnostics ${CODE_ROOT}/diagnostics
 COPY mdtf_framework.py ${CODE_ROOT}
 COPY shared ${CODE_ROOT}/shared
 COPY sites ${CODE_ROOT}/sites
 COPY tests ${CODE_ROOT}/tests
-RUN ls -la ${CODE_ROOT}
 # Install conda environments
 ENV CONDA_ROOT=/root/miniconda3
 ENV CONDA_ENV_DIR=/root/miniconda3/envs
