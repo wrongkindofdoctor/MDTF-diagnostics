@@ -43,3 +43,5 @@ RUN bash ${CODE_ROOT}/src/conda/conda_env_setup.sh --all --conda_root ${CONDA_RO
     --conda_env_dir ${CONDA_ENV_DIR}
 # Verify installation
 RUN ${CODE_ROOT}/mdtf --version
+# Run mdtf on src/default_tests.jsonc
+CMD ["${CODE_ROOT}/mdtf", "-f","${CODE_ROOT}/src/default_tests.jsonc"]
