@@ -1,0 +1,19 @@
+name: run MDTF tests on ParallelWorks cloud platform
+  
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+jobs:
+     intelBuild:
+           runs-on: [self-hosted, pw-platform]
+           steps:
+                - name: Spinning up cluster
+                  run: python3 /home/Jessica.Liptak/pw/storage/mdtf/startClusters.py 
+                - name: Turn off cluster
+                  run: python3 /home/Jessica.Liptak/pw/storage/mdtf/stopClusters.py 
