@@ -17,7 +17,7 @@ volume_list = {os.path.join(MDTF_ROOT,"inputdata"): {'bind': '/proj/inputdata', 
 client = docker.from_env()
 
 mdtf_container = client.containers.run('wrongkindofdoctor/mdtf.alpha-01:latest', \
-   'mdtf -f ' + MDTF_ROOT + '/MDTF-diagnostics/src/default_tests.jsonc -v', \
+   ['mdtf -f ' + MDTF_ROOT + '/MDTF-diagnostics/src/default_tests.jsonc -v'], \
     volumes=volume_list, \
     detach=True, \
     entrypoint="/proj/MDTF-diagnostics/mdtf")
