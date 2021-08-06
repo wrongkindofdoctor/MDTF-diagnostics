@@ -4,6 +4,7 @@ channels:
 - conda-forge
 - defaults
 dependencies:
+- six=1.15.0
 - pip=21.1.1
 - pip :
   - https://files.pythonhosted.org/packages/b2/5a/f988909dfed18c1ac42ad8d9e611e6c5657e270aa6eb68559985dbb69c13/docker-5.0.0-py2.py3-none-any.whl

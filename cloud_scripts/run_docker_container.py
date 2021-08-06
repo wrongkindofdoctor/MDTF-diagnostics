@@ -14,8 +14,6 @@ volume_list = {os.path.join(MDTF_ROOT,"inputdata"): {'bind': '/proj/inputdata', 
    os.path.join(MDTF_ROOT,"MDTF-diagnostics/mdtf"): {'bind': '/proj/MDTF-diagnostics/mdtf', 'mode': 'ro'}, \
    }
 
-
-
 client = docker.from_env()
 
 mdtf_container = client.containers.run('wrongkindofdoctor/mdtf.alpha-01:latest', \
@@ -24,5 +22,8 @@ mdtf_container = client.containers.run('wrongkindofdoctor/mdtf.alpha-01:latest',
     detach=True, \
     entrypoint="/proj/MDTF-diagnostics/mdtf")
 
+# print log information
+logs = mdtf_container.logs(stream=True)
+for line in logs:
+    print(line)
 
-#print(mdtf_container.logs())
