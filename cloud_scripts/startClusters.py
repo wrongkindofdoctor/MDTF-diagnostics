@@ -1,4 +1,4 @@
-
+#!/usr/bin/env python3
 """
   This script will automatically connect to the NOAA ParallelWorks gateway to retrieve
   information about the current clusters using the user's API key.
@@ -9,13 +9,13 @@
       Treat this file as any secure file and place in .ssh directory.Change permissions to mode 600.
 
       New files created:
-         $HOME/.hosts - this is a new file created every time the script is run.  
+         $HOME/.hosts - this is a new file created every time the script is run.
          Do not modify this file externally as any change will be lost.
          If no active clusters exists, the file will be created
          with one commented line.  For the hosts to be recognized,
          the HOSTALIASES environment variable must point this
          file (i.e. export HOSTALIASES=$HOME/.hosts).
-         
+
  """
 import json,requests,sys,time,os
 from client import Client
@@ -44,9 +44,9 @@ try:
     f = open(keyfile, "r")
     api_key = f.readline().strip()
     f.close()
-except IOError: 
+except IOError:
     # Error out if there's no key
-    # could be improved by looking for an environment variable 
+    # could be improved by looking for an environment variable
     # or asking the user to enter the key
     print("Error: API file", keyfile, "does not appear to exist.")
     sys.exit(1)
@@ -82,9 +82,9 @@ while True:
     current_state = c.get_resources()
     for cluster in current_state:
         #print(cluster['name'],cluster['status'])
-        if cluster['name'].lower() in clusters and cluster['status'] == 'on':                                 
-            if cluster['name'].lower() not in started:                         
-                state = cluster['state']                                                    
+        if cluster['name'].lower() in clusters and cluster['status'] == 'on':
+            if cluster['name'].lower() not in started:
+                state = cluster['state']
                 if cluster['name'].lower() not in laststate:
                     print(cluster['name'].lower(),state)
                     laststate[cluster['name'].lower()] = state
@@ -92,7 +92,7 @@ while True:
                 elif laststate[cluster['name'].lower()] != state:
                     print(cluster['name'].lower(),state)
                     laststate[cluster['name'].lower()] = state
-                
+
                 if 'masterNode' in cluster['state']:
                     if cluster['state']['masterNode'] != None:
                         ip = cluster['state']['masterNode']
