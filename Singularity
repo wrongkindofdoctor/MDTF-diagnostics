@@ -20,9 +20,7 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
     conda info
     ${CODE_ROOT}/mdtf -h
 %runscript
-    echo "Container was created $NOW"
     echo "Arguments received: $*"
-    %runscript
     exec ${CODE_ROOT}/mdtf "$@"
  
 %labels
@@ -37,19 +35,19 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
    src
 
 %post
-    apt-get update && apt-get install -y wget
+   apt-get update && apt-get install -y wget
 # Get Miniconda3 installation script
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 # Change permission to execute build script
-    chmod +x Miniconda3-latest-Linux-x86_64.sh
+   chmod +x Miniconda3-latest-Linux-x86_64.sh
 # install Miniconda3 and mamba package
-    bash ./Miniconda3-latest-Linux-x86_64.sh -bfp /usr/local
-    conda init bash
-    conda install -c conda-forge mamba
+   bash ./Miniconda3-latest-Linux-x86_64.sh -bfp /usr/local
+   conda init bash
+   conda install -c conda-forge mamba
 # clean up
-    apt-get clean
-    rm -f Miniconda3-latest-Linux-x86_64.sh
+   apt-get clean
+   rm -f Miniconda3-latest-Linux-x86_64.sh
 # Install MDTF environments and generate wrapper script
-    echo "Building MDTF-diagnostics wrapper and Conda environments"
-    cd ${CODE_ROOT}
-    ./src/conda/conda_env_setup.sh --all --conda_root /usr/local/miniconda3 --env_dir /usr/local/miniconda3/envs
+   echo "Building MDTF-diagnostics wrapper and Conda environments"
+   cd ${CODE_ROOT}
+   ./src/conda/conda_env_setup.sh --all --conda_root /usr/local/miniconda3 --env_dir /usr/local/miniconda3/envs
