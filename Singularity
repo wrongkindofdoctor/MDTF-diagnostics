@@ -5,8 +5,12 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
 %environment
     export CODE_ROOT="/opt/mdtf/MDTF-diagnostics"
 %setup
+    export CODE_ROOT="/opt/mdtf/MDTF-diagnostics"
 # make mdtf directory
-    mkdir -p ${CODE_ROOT}
+    if [[ ! -d "${CODE_ROOT}" ]]
+    then
+       mkdir -p "${CODE_ROOT}"
+    fi
     ls ${CODE_ROOT}
 %files
     src ${CODE_ROOT}/src
