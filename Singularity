@@ -13,11 +13,11 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
     fi
     ls "${CODE_ROOT}"
 %files
-    src ${CODE_ROOT}/src
-    data ${CODE_ROOT}/data
-    shared ${CODE_ROOT}/shared
-    sites ${CODE_ROOT}/sites
-    tests ${CODE_ROOT}/tests
+    src "${CODE_ROOT}"/src
+    data "${CODE_ROOT}"/data
+    shared "${CODE_ROOT}"/shared
+    sites "${CODE_ROOT}"/sites
+    tests "${CODE_ROOT}"/tests
     mdtf_framework.py "${CODE_ROOT}"/mdtf_framework.py
 %test
     echo "TESTING, ATTENTION PLEASE."
