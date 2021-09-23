@@ -2,6 +2,8 @@ BootStrap: debootstrap
 OSVersion: bionic
 MirrorURL: http://us.archive.ubuntu.com/ubuntu/
 
+Bootstrap: docker
+From: continuumio/miniconda3
 %test
     export CODE_ROOT="/opt/mdtf/MDTF-diagnostics"
     echo "TESTING, ATTENTION PLEASE."
@@ -22,39 +24,19 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
    src
 %post
    export CODE_ROOT="/opt/mdtf/MDTF-diagnostics"
-   apt-get update && apt-get install -y wget
-# Get Miniconda3 installation script
-   wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-# Change permission to execute build script
-   chmod +x Miniconda3-latest-Linux-x86_64.sh
-# install Miniconda3 and mamba package
-   bash ./Miniconda3-latest-Linux-x86_64.sh -bfp /usr/local
-   conda install -c conda-forge mamba
+   apt-get update && apt-get install -y git
 # clean up
    apt-get clean
-   rm -f Miniconda3-latest-Linux-x86_64.sh
 # Install MDTF-diagnostics
- # make mdtf directory
-   if [[ ! -d "${CODE_ROOT}" ]]
-   then
-       mkdir -p "${CODE_ROOT}"
-   fi
+# make mdtf directory
+   mkdir -p "${CODE_ROOT}"
    ls "/opt"
-   cd /opt/mdtf
-   git clone https://github.com/wrongkindofdoctor/MDTF-diagnostics.git
-# Install MDTF environments and generate wrapper script
-   echo "Building MDTF-diagnostics wrapper and Conda environments"
-# Make mdtf directory
-   if [[ ! -d "${CODE_ROOT}" ]]
-   then
-       mkdir -p "${CODE_ROOT}"
-   fi
-   ls /opt/mdtf
-   echo "Building MDTF-diagnostics wrapper and Conda environments"
+   chmod -R 775 "${CODE_ROOT}"
+   chmod -R 775 "/opt/conda"
    cd /opt/mdtf
    git clone https://github.com/wrongkindofdoctor/MDTF-diagnostics.git
    ls "${CODE_ROOT}"
    cd "${CODE_ROOT}"
    git checkout develop
    ls ./
-   ${CODE_ROOT}/src/conda/conda_env_setup.sh --all --conda_root /usr/local/miniconda3 --env_dir /usr/local/miniconda3/envs
+   ${CODE_ROOT}/src/conda/conda_env_setup.sh --all --conda_root /opt/conda --env_dir /opt/conda/envs
