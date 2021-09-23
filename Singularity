@@ -2,13 +2,13 @@ BootStrap: debootstrap
 OSVersion: bionic
 MirrorURL: http://us.archive.ubuntu.com/ubuntu/
 
-%environment
-    export CODE_ROOT="/opt/mdtf/MDTF-diagnostics"
 %test
+    export CODE_ROOT="/opt/mdtf/MDTF-diagnostics"
     echo "TESTING, ATTENTION PLEASE."
     conda info
     "${CODE_ROOT}"/mdtf -h
 %runscript
+    export CODE_ROOT="/opt/mdtf/MDTF-diagnostics"
     echo "Arguments received: $*"
     exec "${CODE_ROOT}"/mdtf "$@"
 %labels
@@ -29,12 +29,20 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
    chmod +x Miniconda3-latest-Linux-x86_64.sh
 # install Miniconda3 and mamba package
    bash ./Miniconda3-latest-Linux-x86_64.sh -bfp /usr/local
-   export PATH="/usr/local/miniconda3/bin:$PATH"
    conda install -c conda-forge mamba
 # clean up
    apt-get clean
    rm -f Miniconda3-latest-Linux-x86_64.sh
 # Install MDTF-diagnostics
+ # make mdtf directory
+   if [[ ! -d "${CODE_ROOT}" ]]
+   then
+       mkdir -p "${CODE_ROOT}"
+   fi
+   ls "/opt"
+   cd /opt/mdtf
+   git clone https://github.com/wrongkindofdoctor/MDTF-diagnostics.git
+# Install MDTF environments and generate wrapper script
    echo "Building MDTF-diagnostics wrapper and Conda environments"
 # Make mdtf directory
    if [[ ! -d "${CODE_ROOT}" ]]
@@ -49,4 +57,4 @@ MirrorURL: http://us.archive.ubuntu.com/ubuntu/
    cd "${CODE_ROOT}"
    git checkout develop
    ls ./
-   ${CODE_ROOT}/src/conda/conda_env_setup.sh --all --conda_root /opt/miniconda3 --env_dir /opt/miniconda3/envs
+   ${CODE_ROOT}/src/conda/conda_env_setup.sh --all --conda_root /usr/local/miniconda3 --env_dir /usr/local/miniconda3/envs
