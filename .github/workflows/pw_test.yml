@@ -14,6 +14,6 @@ jobs:
            runs-on: [self-hosted, pw-platform]
            steps:
                 - name: Spinning up cluster
-                  run: python3 /home/Jessica.Liptak/pw/storage/mdtf/startClusters.py 
+                  run: python3 /home/Jessica.Liptak/pw/storage/mdtf/MDTF-diagnostics/cloud_scripts/startClusters.py gcluster_noaa
                 - name: Turn off cluster
-                  run: python3 /home/Jessica.Liptak/pw/storage/mdtf/stopClusters.py 
+                  run: python3 /home/Jessica.Liptak/pw/storage/mdtf/MDTF-diagnostics/cloud_scripts/stopClusters.py gcluster_noaa
