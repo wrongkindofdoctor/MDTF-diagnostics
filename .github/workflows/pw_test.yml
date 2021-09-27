@@ -11,8 +11,8 @@ on:
       - main
       - develop
 jobs:
-     intelBuild:
-           runs-on: [self-hosted, pw-platform]
+     ParallelWorks:
+           runs-on: [pw-platform]
            steps:
                 - name: Spinning up cluster
                   run: python3 /home/Jessica.Liptak/pw/storage/mdtf/MDTF-diagnostics/cloud_scripts/startClusters.py gcluster_noaa
