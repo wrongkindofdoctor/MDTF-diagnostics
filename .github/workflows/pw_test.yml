@@ -5,15 +5,16 @@ on:
     branches:
       - main
       - develop
+      - add_docker_image
   pull_request:
     branches:
       - main
       - develop
 jobs:
-     intelBuild:
-           runs-on: [self-hosted, pw-platform]
+     ParallelWorks:
+           runs-on: [pw-platform]
            steps:
-                - name: Spinning up cluster
-                  run: python3 /home/Jessica.Liptak/pw/storage/mdtf/startClusters.py 
+               # - name: Spinning up cluster
+               #   run: python3 /home/Jessica.Liptak/pw/storage/mdtf/MDTF-diagnostics/cloud_scripts/startClusters.py gcluster_noaa
                 - name: Turn off cluster
-                  run: python3 /home/Jessica.Liptak/pw/storage/mdtf/stopClusters.py 
+                  run: python3 /home/Jessica.Liptak/pw/storage/mdtf/MDTF-diagnostics/cloud_scripts/stopClusters.py gcluster_noaa
