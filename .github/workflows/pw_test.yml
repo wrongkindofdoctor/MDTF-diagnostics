@@ -12,7 +12,7 @@ on:
       - develop
 jobs:
      ParallelWorks:
-           runs-on: [pw-platform]
+           runs-on: [pw-platform, self-hosted]
            steps:
                # - name: Spinning up cluster
                #   run: python3 /home/Jessica.Liptak/pw/storage/mdtf/MDTF-diagnostics/cloud_scripts/startClusters.py gcluster_noaa
