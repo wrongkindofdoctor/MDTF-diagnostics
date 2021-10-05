@@ -6,7 +6,7 @@
 #SBATCH --output=/contrib/${USER}/mdtf/CI_logs  # Standard output and error log
 
 # install required software
-#sudo yum install -y debootstrap.noarch
+sudo yum install -y debootstrap.noarch
 
 # Allows fakeroot:
 #sudo sh -c 'echo user.max_user_namespaces=15000 \
@@ -23,7 +23,8 @@ export MDTF_ROOT=/contrib/${USER}/mdtf
 #                        ${MDTF_ROOT}/MDTF-diagnostics/diagnostics:/proj/mdtf/MDTF-diagnostics/diagnostics, \
 #                        ${MDTF_ROOT}/MDTF-diagnostics/src/default_tests.jsonc:/proj/mdtf/MDTF-diagnostics/src/default_tests.jsonc "
 
-sudo sed -i 's|\#bind path = /scratch|bind path = /contrib/Jessica.Liptak/mdtf/inputdata:/proj/mdtf/inputdata\nbind path = /contrib/Jessica.Liptak/mdtf/wkdir:/proj/mdtf/wkdir\nbind path = /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/diagnostics:/proj/mdtf/MDTF-diagnostics/diagnostics\nbind path = /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/src/default_tests.jsonc:/proj/mdtf/MDTF-diagnostics/src/default_tests.jsonc |g' /etc/singularity/singularity.conf
+sudo sed -i 's|\#bind path = /scratch|bind path = /contrib/Jessica.Liptak/mdtf/inputdata:/proj/mdtf/inputdata\nbind path = /contrib/Jessica.Liptak/mdtf/wkdir:/proj/mdtf/wkdir\nbind path = /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/diagnostics:/proj/mdtf/MDTF-diagnostics/diagnostics\nbind path = /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/src/default_tests.jsonc:/proj/mdtf/MDTF-diagnostics/src/default_tests.jsonc |g' \
+   /etc/singularity/singularity.conf
 
 cd ${MDTF_ROOT}/MDTF-diagnostics
 
