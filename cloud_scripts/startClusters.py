@@ -120,7 +120,7 @@ for ei,entry in enumerate(cluster_hosts):
          name = entry.split()[0]
          ip = entry.split()[1]
 #         cmd = "/home/Jessica.Liptak/pw/storage/mdtf/MDTF-diagnostics/mdtf -f /home/Jessica.Liptak/pw/storage/mdtf/MDTF-diagnostics/src/default_tests.jsonc -v"
-          cmd = "sbatch /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/cloud_scripts/run_mdtf_singularity_container.sh"
+         cmd = "sbatch /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/cloud_scripts/run_mdtf_singularity_container.sh"
          print("")
          out = subprocess.check_output(
              cmd,
