@@ -1,9 +1,4 @@
 #!/bin/bash -x
-#SBATCH --job-name=test_am4
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --time=00:30:00 # Time limit hrs:min:sec
-#SBATCH --output=/contrib/${USER}/mdtf/CI_logs  # Standard output and error log
 
 # install required software
 sudo yum install -y debootstrap.noarch
@@ -17,15 +12,21 @@ sudo yum install -y debootstrap.noarch
 #sudo singularity config fakeroot --add ${USER}
 
 export MDTF_ROOT=/contrib/${USER}/mdtf
-# will probably need to modify /etc/singularity/singularity.conf BIND_PATH section instead to get this to work
-#export SINGULARITY_BINDPATH="${MDTF_ROOT}/inputdata:/proj/mdtf/inputdata, \
-#                        ${MDTF_ROOT}/wkdir:/proj/mdtf/wkdir, \
-#                        ${MDTF_ROOT}/MDTF-diagnostics/diagnostics:/proj/mdtf/MDTF-diagnostics/diagnostics, \
-#                        ${MDTF_ROOT}/MDTF-diagnostics/src/default_tests.jsonc:/proj/mdtf/MDTF-diagnostics/src/default_tests.jsonc "
 
+# clean up the old working directory files
+if [ -d "wkdir" ]; then
+  printf '%s\n' "Removing wkdir directory"
+  rm -rf "wkdir"
+fi
+mkdir wkdir
+# define the bind paths in the singularity.conf file
 sudo sed -i 's|\#bind path = /scratch|bind path = /contrib/Jessica.Liptak/mdtf/inputdata:/proj/mdtf/inputdata\nbind path = /contrib/Jessica.Liptak/mdtf/wkdir:/proj/mdtf/wkdir\nbind path = /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/diagnostics:/proj/mdtf/MDTF-diagnostics/diagnostics\nbind path = /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/src/default_tests.jsonc:/proj/mdtf/MDTF-diagnostics/src/default_tests.jsonc |g' \
    /etc/singularity/singularity.conf
 
-cd ${MDTF_ROOT}/MDTF-diagnostics
+# clone the MDTF-diagnostics repo
+cd ${MDTF_ROOT}
+git clone -b add_docker_image https://github.com/wrongkindofdoctor/MDTF-diagnostics.git
 
+cd ${MDTF_ROOT}/MDTF-diagnostics
+# run the singularity container
 sudo singularity run mdtf.sif -f /proj/mdtf/MDTF-diagnostics/src/default_tests.jsonc -v
