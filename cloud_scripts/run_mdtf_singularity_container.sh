@@ -11,7 +11,7 @@ sudo yum install -y debootstrap.noarch
 
 #sudo singularity config fakeroot --add ${USER}
 
-export MDTF_ROOT=/contrib/${USER}/mdtf
+export MDTF_ROOT="/contrib/${USER}/mdtf"
 
 # clean up the old working directory files
 if [ -d "wkdir" ]; then
@@ -25,8 +25,11 @@ sudo sed -i 's|\#bind path = /scratch|bind path = /contrib/Jessica.Liptak/mdtf/i
 
 # clone the MDTF-diagnostics repo
 cd ${MDTF_ROOT}
+if [ -d "MDTF-diagnostics" ]; then
+  printf '%s\n' "Removing existing MDTF-diagnostics directory"
+  rm -rf "MDTF-diagnostics"
+fi
 git clone -b add_docker_image https://github.com/wrongkindofdoctor/MDTF-diagnostics.git
 
-cd ${MDTF_ROOT}/MDTF-diagnostics
 # run the singularity container
-sudo singularity run mdtf.sif -f /proj/mdtf/MDTF-diagnostics/src/default_tests.jsonc -v
+sudo singularity run mdtf_diagnostics.sif -f /proj/mdtf/MDTF-diagnostics/src/default_tests.jsonc -v

@@ -118,13 +118,21 @@ print("\nRunning MDTF-diagnostics container on the GCP cluster...")
 test_cmd = "/contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/cloud_scripts/run_mdtf_singularity_container.sh"
 for ei,entry in enumerate(cluster_hosts):
     if ei > 0: # skip the host header
-         name = entry.split()[0]
-         ip = entry.split()[1]
-#         cmd = "/home/Jessica.Liptak/pw/storage/mdtf/MDTF-diagnostics/mdtf -f /home/Jessica.Liptak/pw/storage/mdtf/MDTF-diagnostics/src/default_tests.jsonc -v"
-         cmd = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null %s@%s %s" % (user,ip,testcmd)
-         print("")
-         out = subprocess.check_output(
-             cmd,
-             stderr=subprocess.STDOUT,
-             shell=True).decode(sys.stdout.encoding)
-         print(out)
+        name = entry.split()[0]
+        ip = entry.split()[1]
+#        cmd = "/home/Jessica.Liptak/pw/storage/mdtf/MDTF-diagnostics/mdtf -f /home/Jessica.Liptak/pw/storage/mdtf/MDTF-diagnostics/src/default_tests.jsonc -v"
+        cmd = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null %s@%s %s" % (user,ip,test_cmd)
+#        cmd = "srun --ntasks=1 --output=/scratch/%u/slurm-%N-%j.out" test_cmd
+        print("")
+        print(name+':','"'+cmd+'"')
+        try:
+            out = subprocess.check_output(
+            cmd,
+            stderr=subprocess.STDOUT,
+            shell=True).decode(sys.stdout.encoding)
+        except subprocess.CalledProcessError as e:
+            print (e.output)
+            print (e.returncode)
+            sys.exit('The build was unsuccessful')
+
+    print(out)
