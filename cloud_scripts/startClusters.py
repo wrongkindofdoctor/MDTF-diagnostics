@@ -119,7 +119,7 @@ with open(hostsfile, 'w+') as f:
 # run container on clusters
 print("\nRunning MDTF-diagnostics container on the GCP cluster...")
 
-test_cmd = os.path.join("contrib",user,"run_mdtf_singularity_container.sh")
+test_cmd = os.path.join("/contrib",user,"run_mdtf_singularity_container.sh")
 for ei,entry in enumerate(cluster_hosts):
     if ei > 0: # skip the host header
         name = entry.split()[0]
