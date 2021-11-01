@@ -17,14 +17,18 @@
          file (i.e. export HOSTALIASES=$HOME/.hosts).
 
  """
-import json, requests,sys,time,os
+import json
+import requests
+import sys
+import time
+import os
 import subprocess
 from client import Client
 
 # inputs
 pw_url = "https://noaa.parallel.works"
 # specify the clusters to start and wait for activation
-#clusters = ["gcluster_noaa"]
+# clusters = ["gcluster_noaa"]
 clusters = [x.lower() for x in sys.argv[1].split(',')]
 
 print('\nStarting clusters:',clusters)
@@ -115,14 +119,12 @@ with open(hostsfile, 'w+') as f:
 # run container on clusters
 print("\nRunning MDTF-diagnostics container on the GCP cluster...")
 
-test_cmd = "/contrib/Jessica.Liptak/run_mdtf_singularity_container.sh"
+test_cmd = os.path.join("contrib",user,"run_mdtf_singularity_container.sh")
 for ei,entry in enumerate(cluster_hosts):
     if ei > 0: # skip the host header
         name = entry.split()[0]
         ip = entry.split()[1]
-#        cmd = "/home/Jessica.Liptak/pw/storage/mdtf/MDTF-diagnostics/mdtf -f /home/Jessica.Liptak/pw/storage/mdtf/MDTF-diagnostics/src/default_tests.jsonc -v"
         cmd = "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null %s@%s %s" % (user,ip,test_cmd)
-#        cmd = "srun --ntasks=1 --output=/scratch/%u/slurm-%N-%j.out" test_cmd
         print("")
         print(name+':','"'+cmd+'"')
         try:

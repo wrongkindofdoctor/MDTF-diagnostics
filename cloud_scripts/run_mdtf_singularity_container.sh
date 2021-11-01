@@ -3,14 +3,6 @@
 # install required software
 sudo yum install -y debootstrap.noarch
 
-# Allows fakeroot:
-#sudo sh -c 'echo user.max_user_namespaces=15000 \
-#    >/etc/sysctl.d/90-max_net_namespaces.conf'
-
-#sudo sysctl -p /etc/sysctl.d /etc/sysctl.d/90-max_net_namespaces.conf
-
-#sudo singularity config fakeroot --add ${USER}
-
 export MDTF_ROOT="/contrib/${USER}/mdtf"
 
 # clean up the old working directory files
