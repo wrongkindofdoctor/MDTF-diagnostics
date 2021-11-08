@@ -15,7 +15,7 @@ From: continuumio/miniconda3
    This is a singularity definitions file for the MDTF-diagnostics Package.
    Users should clone the MDTF-diagnostics repo to their machine as instructed
    in the documentation, then mount the following directories and files:
-   src/default_tests.jsonc 
+   src/default_tests.jsonc
    MDTF-diagnostics/diagnostics
    the working directory ($WKDIR; ../wkdir by default)
    the input data directory (../inputdata by default)
@@ -44,10 +44,9 @@ From: continuumio/miniconda3
    mkdir inputdata
    mkdir wkdir
    chmod -R 775 "${CODE_ROOT}"
-   git clone https://github.com/NOAA-GFDL/MDTF-diagnostics.git
+   git clone -b add_docker_image https://github.com/wrongkindofdoctor/MDTF-diagnostics.git
    ls "${CODE_ROOT}"
    cd "${CODE_ROOT}"
-   git checkout develop
    ${CODE_ROOT}/src/conda/conda_env_setup.sh --all --conda_root /opt/conda --env_dir /opt/conda/envs
    # remove directories that will be user-mounted for modification
    rm -rf doc
