@@ -12,8 +12,7 @@ if [ -d "wkdir" ]; then
 fi
 mkdir wkdir
 # define the bind paths in the singularity.conf file
-sudo sed -i 's|\#bind path = /scratch|bind path = /contrib/Jessica.Liptak/mdtf/inputdata:/proj/mdtf/inputdata\nbind path = /contrib/Jessica.Liptak/mdtf/wkdir:/proj/mdtf/wkdir\nbind path = /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/diagnostics:/proj/mdtf/MDTF-diagnostics/diagnostics\nbind path = /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/tests/github_actions_test_pw_gcp_qboi_cesm.jsonc:/proj/mdtf/MDTF-diagnostics/tests/github_actions_test_pw_gcp_qboi_cesm.jsonc
-  \nbind path = /contrib/Jessica.Liptak/mdtf/wkdir:/proj/mdtf/wkdir\nbind path = /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/diagnostics:/proj/mdtf/MDTF-diagnostics/diagnostics\nbind path = /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/tests/github_actions_test_pw_gcp_gfdl_cm4.jsonc:/proj/mdtf/MDTF-diagnostics/tests/github_actions_test_pw_gcp_gfdl_cm4.jsonc |g' \
+sudo sed -i 's|\#bind path = /scratch|bind path = /contrib/Jessica.Liptak/mdtf/inputdata:/proj/mdtf/inputdata\nbind path = /contrib/Jessica.Liptak/mdtf/wkdir:/proj/mdtf/wkdir\nbind path = /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/diagnostics:/proj/mdtf/MDTF-diagnostics/diagnostics\nbind path = /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/tests/github_actions_test_pw_gcp_qboi_cesm.jsonc:/proj/mdtf/MDTF-diagnostics/tests/github_actions_test_pw_gcp_qboi_cesm.jsonc\nbind path = /contrib/Jessica.Liptak/mdtf/wkdir:/proj/mdtf/wkdir\nbind path = /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/diagnostics:/proj/mdtf/MDTF-diagnostics/diagnostics\nbind path = /contrib/Jessica.Liptak/mdtf/MDTF-diagnostics/tests/github_actions_test_pw_gcp_gfdl_cm4.jsonc:/proj/mdtf/MDTF-diagnostics/tests/github_actions_test_pw_gcp_gfdl_cm4.jsonc |g' \
   /etc/singularity/singularity.conf
 
 # clone the MDTF-diagnostics repo
