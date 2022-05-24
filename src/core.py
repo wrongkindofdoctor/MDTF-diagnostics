@@ -90,10 +90,13 @@ class MDTFObjectBase(metaclass=util.MDTFABCMeta):
         """Iterable of child objects associated with this object."""
         pass
 
+    # This is a figurative "birth" routine that generates an object full of child objects
     def iter_children(self, child_type=None, status=None, status_neq=None):
         """Generator iterating over child objects associated with this object.
 
         Args:
+            child_type: None or Type `type`; default None. If None, iterates over
+            all child objects regardless of their types
             status: None or :class:`ObjectStatus`, default None. If None,
                 iterates over all child objects, regardless of status. If a
                 :class:`ObjectStatus` value is passed, only iterates over
@@ -103,11 +106,11 @@ class MDTFObjectBase(metaclass=util.MDTFABCMeta):
                 If *status* is set, this setting is ignored.
         """
         iter_ = self._children
-        if child_type is not None:
+        if child_type is not None:  # return the iter_ elements that match a specified child_type
             iter_ = filter((lambda x: isinstance(x, child_type)), iter_)
-        if status is not None:
+        if status is not None:  # return the iter_ elements that match the specified status
             iter_ = filter((lambda x: x.status == status), iter_)
-        elif status_neq is not None:
+        elif status_neq is not None:  # return the iter elements that do NOT match status_neq
             iter_ = filter((lambda x: x.status != status_neq), iter_)
         yield from iter_
 
