@@ -61,6 +61,7 @@ class MDTFObjectBase(metaclass=util.MDTFABCMeta):
         # init object-level logger
         self.log = util.MDTFObjectLogger.get_logger(self._log_name)
 
+    # the @property decorator allows us to attach code to designated attribute, such as getter and setter methods
     @property
     def _log_name(self):
         if self._parent is None:
@@ -171,7 +172,8 @@ class ConfigManager(util.Singleton, util.NameSpace):
         else:
             # normal code path
             self.pod_data = pod_info_tuple.pod_data
-            self.update(cli_obj.config)
+            self.update(cli_obj.config)  # the update method is a Python built-in that adds items from
+            # an iterable or another dictionay to a dictionay
             backup_config = self.backup_config(cli_obj, case_d)
             self._configs[backup_config.name] = backup_config
             self._configs['log_config'] = ConfigTuple(
@@ -798,6 +800,7 @@ class VariableTranslator(util.Singleton):
 
 # ---------------------------------------------------------------------------
 
+
 class MDTFFramework(MDTFObjectBase):
     def __init__(self, cli_obj):
         super(MDTFFramework, self).__init__(
@@ -903,6 +906,7 @@ class MDTFFramework(MDTFObjectBase):
             self.multirun = True
             _log.info("Running framework in multi-run mode ")
         else:
+            self.multirun = False
             _log.info("Running framework in single-run mode ")
         # check this here, otherwise error raised about missing caselist is not informative
         try:

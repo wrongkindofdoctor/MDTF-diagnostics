@@ -4,8 +4,10 @@ model data requested by the PODs for multirun mode
 (i.e., a single POD is associated with multiple data sources)
 """
 import dataclasses as dc
-import copy
-from src import util, diagnostic, data_model
+import typing
+from abc import ABCMeta
+
+from src import core, diagnostic, data_model, util
 
 import logging
 
@@ -62,8 +64,9 @@ class MultirunDiagnostic(diagnostic.Diagnostic):
     #  _interpreters = {'.py': 'python', '.ncl': 'ncl', '.R': 'Rscript'}
     varlist = MultirunVarlist = None
 
+
 @util.mdtf_dataclass
-class MultirunVarlistEntry(diagnostic.VarlistEntry):
+class MultirunVarlistEntry(diagnostic.VarlistEntryBase, diagnostic.Varlist):
     # Attributes:
     #         path_variable: Name of env var containing path to local data.
     #         dest_path: list of paths to local data
@@ -77,31 +80,18 @@ class MultirunVarlistEntry(diagnostic.VarlistEntry):
     # dims: list
     # scalar_coords: list
     # modifier: str
-    # use_exact_name: bool = False   # fields inherited from diagnostic.VarlistEntry
-    # env_var: str = dc.field(default="", compare=False)
-    # path_variable: str = dc.field(default="", compare=False)
-    # dest_path: str = ""
-    # requirement: VarlistEntryRequirement = dc.field(default=VarlistEntryRequirement.REQUIRED, compare=False)
-    # alternates: list = dc.field(default_factory=list, compare=False)
-    # translation: typing.Any = dc.field(default=None, compare=False)
-    # data: util.ConsistentDict = dc.field(default_factory=util.ConsistentDict, compare=False)
-    # stage: VarlistEntryStage = dc.field(default=VarlistEntryStage.NOTSET, compare=False)
-    # _deactivation_log_level = logging.INFO
+    use_exact_name: bool = False
+    env_var: str = dc.field(default="", compare=False)
+    path_variable: list = dc.field(default_factory=list, compare=False)
+    dest_path: list = dc.field(default_factory=list, compare=False)
+    requirement: diagnostic.VarlistEntryRequirement = \
+        dc.field(default=diagnostic.VarlistEntryRequirement.REQUIRED, compare=False)
+    alternates: list = dc.field(default_factory=list, compare=False)
+    translation: typing.Any = dc.field(default=None, compare=False)
+    data: util.ConsistentDict = dc.field(default_factory=util.ConsistentDict, compare=False)
+    stage: diagnostic.VarlistEntryStage = dc.field(default=diagnostic.VarlistEntryStage.NOTSET, compare=False)
+    _deactivation_log_level = logging.INFO
 
-    def __init__(self, *args, **kwargs):
-        #  Field: class variable that has a type annotation
-        # The field function is used for controlling class attributes present in the dataclass
-        # Using the default_factory parameter, we can provide a callable(function, etc... which returns a value)
-        # as the default value which acts as a factory method to create a default value for that specific class
-        # attribute which has the field function with the default_factory parameter
-        # If compare is set to True for any class attribute, then it is included in the methods which are generated
-        # (compare and equality methods) for comparing dataclass objects
-        super(MultirunVarlistEntry, self).__init__(*args, **kwargs)
-        self.path_variable: list = dc.field(default_factory=list,
-                                       compare=False)  # each variable will have a list of paths to files for
-        # each case don't need compare methods b/c this will be a list of strings, not booleans, ints, etc...
-        self.dest_path: list = dc.field(default_factory=list,
-                                   compare=False)
 
    # @property
     #def _log_name(self):

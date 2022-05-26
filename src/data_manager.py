@@ -242,7 +242,7 @@ class DataSourceBase(core.MDTFObjectBase, util.CaseLoggerMixin,
             case_dict, self._AttributesClass, log=self.log, init=True
         )
         self.pods = dict.fromkeys(case_dict.get('pod_list', []))
-
+        self.multirun = parent.multirun
         # set variable name convention
         translate = core.VariableTranslator()
         if hasattr(self, '_convention'):

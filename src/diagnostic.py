@@ -130,7 +130,87 @@ VarlistEntryStage.__doc__ = """
 """
 
 @util.mdtf_dataclass
-class VarlistEntry(core.MDTFObjectBase, data_model.DMVariable,
+class VarlistEntryBase(metaclass=util.MDTFABCMeta):
+    """Base class for VarlistEntry
+
+    Attributes:
+        use_exact_name: see docs
+        env_var: Name of env var which is set to the variable's name in the
+            provided dataset.
+        path_variable: Name of env var containing path(s) to local data.
+        dest_path: Path(s) to local data.
+        alternates: List of lists of VarlistEntries.
+        translation: :class:`core.TranslatedVarlistEntry`, populated by DataSource.
+        stage: enum to track processing stages of VarlistEntry classes
+        data: dict mapping experiment_keys to DataKeys. Populated by DataSource.
+    """
+
+    def __init_subclass__(cls):
+        required_class_variables = [
+            'use_exact_name',
+            'env_var',
+            'path_variable',
+            'dest_path',
+            'requirement',
+            'alternates',
+            'translation',
+            'data',
+            'stage',
+            '_deactivation_log_level'
+        ]
+        for var in required_class_variables:
+            if not hasattr(cls, var):
+                raise NotImplementedError(
+                    f'Class {cls} lacks required `{var}` class attribute'
+                )
+
+    def __post_init__(self):
+        pass
+
+    @property
+    def _children(self):
+        pass
+
+    @property
+    def name_in_model(self):
+        pass
+
+    @classmethod
+    def from_struct(cls):
+        pass
+
+    def iter_alternates(self):
+
+        def _iter_alternates():
+            pass
+
+    @staticmethod
+    def alternates_str(alt_list):
+        pass
+
+    def debug_str(self):
+        pass
+
+    def iter_data_keys(self):
+        pass
+
+    def deactivate_data_key(self):
+        pass
+
+    @property
+    def local_data(self):
+        pass
+
+    def query_attrs(self):
+        def iter_query_attrs():
+            pass
+
+    @property
+    def env_vars(self):
+        pass
+
+@util.mdtf_dataclass
+class VarlistEntry(VarlistEntryBase, core.MDTFObjectBase, data_model.DMVariable,
     _VarlistGlobalSettings, util.VarlistEntryLoggerMixin):
     """Class to describe data for a single variable requested by a POD.
     Corresponds to list entries in the "varlist" section of the POD's
