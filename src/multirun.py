@@ -7,7 +7,7 @@ import dataclasses as dc
 import typing
 from abc import ABCMeta
 
-from src import core, diagnostic, data_model, util
+from src import util, diagnostic
 
 import logging
 
@@ -31,14 +31,14 @@ _log = logging.getLogger(__name__)
 # This also ensures that the same attribute object is not reused each time it is called
 # Therefore, you can modify individual values in one dc.field instance without propagating the
 # changes to other object instances
-class MultirunVarlist(diagnostic.Varlist):
+#class MultirunVarlist(diagnostic.Varlist):
     # contents: dc.InitVar = util.MANDATORY # fields inherited from data_model.DMDataSet
     # vars: list = dc.field(init=False, default_factory=list)
     # coord_bounds: list = dc.field(init=False, default_factory=list)
     # aux_coords: list = dc.field(init=False, default_factory=list)
-    pass
+ #   pass
 
-class MultirunDiagnostic(diagnostic.Diagnostic):
+#class MultirunDiagnostic(diagnostic.Diagnostic):
     # _id = util.MDTF_ID()           # fields inherited from core.MDTFObjectBase
     # name: str
     # _parent: object
@@ -62,11 +62,11 @@ class MultirunDiagnostic(diagnostic.Diagnostic):
     # POD_OUT_DIR = ""
     # _deactivation_log_level = logging.ERROR
     #  _interpreters = {'.py': 'python', '.ncl': 'ncl', '.R': 'Rscript'}
-    varlist = MultirunVarlist = None
+    #varlist = MultirunVarlist = None
 
 
 @util.mdtf_dataclass
-class MultirunVarlistEntry(diagnostic.VarlistEntryBase, diagnostic.Varlist):
+class MultirunVarlistEntry(diagnostic.Varlist, diagnostic.VarlistEntryBase):
     # Attributes:
     #         path_variable: Name of env var containing path to local data.
     #         dest_path: list of paths to local data
@@ -103,4 +103,4 @@ class MultirunVarlistEntry(diagnostic.VarlistEntryBase, diagnostic.Varlist):
 
 
 #if __name__ == "__main__":
-#    print(MultirunDiagnostic.mro())
+#    print(MultirunVarlistEntry.mro())

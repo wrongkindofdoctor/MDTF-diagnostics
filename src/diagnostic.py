@@ -210,54 +210,7 @@ class VarlistEntryBase(metaclass=util.MDTFABCMeta):
         pass
 
 @util.mdtf_dataclass
-class VarlistEntry(VarlistEntryBase, core.MDTFObjectBase, data_model.DMVariable,
-    _VarlistGlobalSettings, util.VarlistEntryLoggerMixin):
-    """Class to describe data for a single variable requested by a POD.
-    Corresponds to list entries in the "varlist" section of the POD's
-    settings.jsonc file.
-
-    Two VarlistEntries are equal (as determined by the ``__eq__`` method, which
-    compares fields without ``compare=False``) if they specify the same data
-    product, ie if the same output file from the preprocessor can be symlinked
-    to two different locations.
-
-    Attributes:
-        use_exact_name: see docs
-        env_var: Name of env var which is set to the variable's name in the
-            provided dataset.
-        path_variable: Name of env var containing path to local data.
-        dest_path: Path to local data.
-        alternates: List of lists of VarlistEntries.
-        translation: :class:`core.TranslatedVarlistEntry`, populated by DataSource.
-        data: dict mapping experiment_keys to DataKeys. Populated by DataSource.
-    """
-    # _id = util.MDTF_ID()           # fields inherited from core.MDTFObjectBase
-    # name: str
-    # _parent: object
-    # log = util.MDTFObjectLogger
-    # status: ObjectStatus
-    # standard_name: str           # fields inherited from data_model.DMVariable
-    # units: Units
-    # dims: list
-    # scalar_coords: list
-    # modifier: str
-    use_exact_name: bool = False
-    env_var: str = dc.field(default="", compare=False)
-    path_variable: str = dc.field(default="", compare=False)
-    dest_path: str = ""
-    requirement: VarlistEntryRequirement = dc.field(
-        default=VarlistEntryRequirement.REQUIRED, compare=False
-    )
-    alternates: list = dc.field(default_factory=list, compare=False)
-    translation: typing.Any = dc.field(default=None, compare=False)
-    data: util.ConsistentDict = dc.field(default_factory=util.ConsistentDict,
-        compare=False)
-    stage: VarlistEntryStage = dc.field(
-        default=VarlistEntryStage.NOTSET, compare=False
-    )
-
-    _deactivation_log_level = logging.INFO # default log level for failure
-
+class VarlistEntryMixin(object):
     def __post_init__(self, coords=None):
         # inherited from two dataclasses, so need to call post_init on each directly
         core.MDTFObjectBase.__post_init__(self)
@@ -507,6 +460,85 @@ class VarlistEntry(VarlistEntryBase, core.MDTFObjectBase, data_model.DMVariable,
                 d[dim.name + _coord_bounds_env_var_suffix] = trans_dim.bounds
         return d
 
+
+@util.mdtf_dataclass
+class VarlistEntry(VarlistEntryMixin, VarlistEntryBase, core.MDTFObjectBase, data_model.DMVariable,
+                   _VarlistGlobalSettings, util.VarlistEntryLoggerMixin):
+    """Class to describe data for a single variable requested by a POD.
+    Corresponds to list entries in the "varlist" section of the POD's
+    settings.jsonc file.
+
+    Two VarlistEntries are equal (as determined by the ``__eq__`` method, which
+    compares fields without ``compare=False``) if they specify the same data
+    product, ie if the same output file from the preprocessor can be symlinked
+    to two different locations.
+
+    Attributes:
+        use_exact_name: see docs
+        env_var: Name of env var which is set to the variable's name in the
+            provided dataset.
+        path_variable: Name of env var containing path to local data.
+        dest_path: Path to local data.
+        alternates: List of lists of VarlistEntries.
+        translation: :class:`core.TranslatedVarlistEntry`, populated by DataSource.
+        data: dict mapping experiment_keys to DataKeys. Populated by DataSource.
+    """
+    # _id = util.MDTF_ID()           # fields inherited from core.MDTFObjectBase
+    # name: str
+    # _parent: object
+    # log = util.MDTFObjectLogger
+    # status: ObjectStatus
+    # standard_name: str           # fields inherited from data_model.DMVariable
+    # units: Units
+    # dims: list
+    # scalar_coords: list
+    # modifier: str
+    use_exact_name: bool = False
+    env_var: str = dc.field(default="", compare=False)
+    path_variable: str = dc.field(default="", compare=False)
+    dest_path: str = ""
+    requirement: VarlistEntryRequirement = dc.field(
+        default=VarlistEntryRequirement.REQUIRED, compare=False
+    )
+    alternates: list = dc.field(default_factory=list, compare=False)
+    translation: typing.Any = dc.field(default=None, compare=False)
+    data: util.ConsistentDict = dc.field(default_factory=util.ConsistentDict,
+        compare=False)
+    stage: VarlistEntryStage = dc.field(
+        default=VarlistEntryStage.NOTSET, compare=False
+    )
+
+    _deactivation_log_level = logging.INFO # default log level for failure
+
+@util.mdtf_dataclass
+class MultirunVarlistEntry(VarlistEntryMixin, VarlistEntryBase, core.MDTFObjectBase, data_model.DMVariable,
+                           _VarlistGlobalSettings, util.VarlistEntryLoggerMixin):
+    # Attributes:
+    #         path_variable: Name of env var containing path to local data.
+    #         dest_path: list of paths to local data
+    # _id = util.MDTF_ID()           # fields inherited from core.MDTFObjectBase
+    # name: str
+    # _parent: object
+    # log = util.MDTFObjectLogger
+    # status: ObjectStatus
+    # standard_name: str             # fields inherited from data_model.DMVariable
+    # units: Units
+    # dims: list
+    # scalar_coords: list
+    # modifier: str
+    use_exact_name: bool = False
+    env_var: str = dc.field(default="", compare=False)
+    path_variable: list = dc.field(default_factory=list, compare=False)
+    dest_path: list = dc.field(default_factory=list, compare=False)
+    requirement: VarlistEntryRequirement = \
+        dc.field(default=VarlistEntryRequirement.REQUIRED, compare=False)
+    alternates: list = dc.field(default_factory=list, compare=False)
+    translation: typing.Any = dc.field(default=None, compare=False)
+    data: util.ConsistentDict = dc.field(default_factory=util.ConsistentDict, compare=False)
+    stage: VarlistEntryStage = dc.field(default=VarlistEntryStage.NOTSET, compare=False)
+    _deactivation_log_level = logging.INFO
+
+
 class Varlist(data_model.DMDataSet):
     """Class to perform bookkeeping for the model variables requested by a
     single POD.
@@ -559,6 +591,10 @@ class Varlist(data_model.DMDataSet):
             k: VarlistEntry.from_struct(globals_d, dims_d, name=k, parent=parent, **v) \
             for k,v in d['varlist'].items()
         }
+ #       test_vlist_vars  = {
+  #          k: MultirunVarlistEntry.from_struct(globals_d, dims_d, name=k, parent=parent, **v) \
+  #          for k,v in d['varlist'].items()
+  #      }
         for v in vlist_vars.values():
             # validate & replace names of alt vars with references to VE objects
             for altv_name in _iter_shallow_alternates(v):

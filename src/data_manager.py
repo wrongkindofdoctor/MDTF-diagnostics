@@ -356,8 +356,6 @@ class DataSourceBase(core.MDTFObjectBase, util.CaseLoggerMixin,
         parent_vars = pod.varlist.vars
         for v in parent_vars:
             print(v)
-            child = multirun.MultirunVarlistEntry()
-        #          child.from_parent(v)
         pod.multirun = True
         try:
             pod.setup(self)
