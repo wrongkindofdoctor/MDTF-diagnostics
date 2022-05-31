@@ -544,11 +544,13 @@ class Varlist(data_model.DMDataSet):
     single POD.
     """
     @classmethod
-    def from_struct(cls, d, parent):
+    def from_struct(cls, d, parent, multirun=False):
         """Parse the "dimensions", "data" and "varlist" sections of the POD's
         settings.jsonc file when instantiating a new :class:`Diagnostic` object.
 
         Args:
+            parent: instance of the parent class object
+            multirun: if True, use multirun methods
             d (:py:obj:`dict`): Contents of the POD's settings.jsonc file.
 
         Returns:
@@ -587,14 +589,16 @@ class Varlist(data_model.DMDataSet):
             for k,v in d['dimensions'].items()}
 
         assert 'varlist' in d
-        vlist_vars = {
-            k: VarlistEntry.from_struct(globals_d, dims_d, name=k, parent=parent, **v) \
-            for k,v in d['varlist'].items()
-        }
- #       test_vlist_vars  = {
-  #          k: MultirunVarlistEntry.from_struct(globals_d, dims_d, name=k, parent=parent, **v) \
-  #          for k,v in d['varlist'].items()
-  #      }
+        if multirun:
+            vlist_vars = {
+                k: MultirunVarlistEntry.from_struct(globals_d, dims_d, name=k, parent=parent, **v) \
+                for k, v in d['varlist'].items()
+            }
+        else:
+            vlist_vars = {
+                k: VarlistEntry.from_struct(globals_d, dims_d, name=k, parent=parent, **v) \
+                for k, v in d['varlist'].items()
+            }
         for v in vlist_vars.values():
             # validate & replace names of alt vars with references to VE objects
             for altv_name in _iter_shallow_alternates(v):
@@ -687,7 +691,7 @@ class Diagnostic(core.MDTFObjectBase, util.PODLoggerMixin):
             raise util.PodConfigError("Caught exception while parsing settings",
                 pod_name) from exc
         try:
-            pod.varlist = Varlist.from_struct(d, parent=pod)
+            pod.varlist = Varlist.from_struct(d, parent=pod, multirun=parent.multirun)
         except Exception as exc:
             raise util.PodConfigError("Caught exception while parsing varlist",
                 pod_name) from exc
