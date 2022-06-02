@@ -538,6 +538,38 @@ class MultirunVarlistEntry(VarlistEntryMixin, VarlistEntryBase, core.MDTFObjectB
     stage: VarlistEntryStage = dc.field(default=VarlistEntryStage.NOTSET, compare=False)
     _deactivation_log_level = logging.INFO
 
+    # override VarlistEntryMixin post_init method to append path_variable strings to listt
+    def __post_init__(self, coords=None):
+        # inherited from two dataclasses, so need to call post_init on each directly
+        core.MDTFObjectBase.__post_init__(self)
+        # set up log (VarlistEntryLoggerMixin)
+        self.init_log()
+        data_model.DMVariable.__post_init__(self, coords)
+
+        # (re)initialize mutable fields here so that if we copy VE (eg with .replace)
+        # the fields on the copy won't point to the same object as the fields on
+        # the original.
+        self.translation = None
+        self.data: util.ConsistentDict()
+        # activate required vars
+        if self.status == core.ObjectStatus.NOTSET:
+            if self.requirement == VarlistEntryRequirement.REQUIRED:
+                self.status = core.ObjectStatus.ACTIVE
+            else:
+                self.status = core.ObjectStatus.INACTIVE
+
+        # env_vars
+        if not self.env_var:
+            self.env_var = self.name + _var_name_env_var_suffix
+        if not self.path_variable:
+            self.path_variable = self.name.upper() + _file_env_var_suffix
+
+        # self.alternates is either [] or a list of nonempty lists of VEs
+        if self.alternates:
+            if not isinstance(self.alternates[0], list):
+                self.alternates = [self.alternates]
+            self.alternates = [vs for vs in self.alternates if vs]
+
 
 class Varlist(data_model.DMDataSet):
     """Class to perform bookkeeping for the model variables requested by a

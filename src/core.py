@@ -1134,12 +1134,12 @@ class MDTFFramework(MDTFObjectBase):
             for pod in self.pod_list:
                 for case_name, case_d in self.cases.items():
                     _log.info("### %s: initializing case '%s'.", self.full_name, case_name)
-                    case = self.DataSource(case_d, parent=self)
+                    case = self.MultirunDataSource(case_d, parent=self) # TODO--properly configure self with Multirundatasource att
                     case.setup(pod)
                    # case.setup_multirun(pod)
                     new_d[case_name] = case
                 # use info from last case, since POD data is common to all cases
-                pod_config = case.get_pod_config_multirun(pod)
+                pod_config = case.get_pod_config(pod)
                 self.cases = new_d
                 util.transfer_log_cache(close=True)
 
