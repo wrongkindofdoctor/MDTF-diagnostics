@@ -309,9 +309,9 @@ class ExplicitFileDataAttributes(dm.DataSourceAttributesBase):
     # LASTYR: str
     # date_range: util.DateRange
     # CASE_ROOT_DIR: str
-    # convention: str
     # log: dataclasses.InitVar = _log
     config_file: str = None
+    convention: str = ""
 
     def __post_init__(self, log=_log):
         """Validate user input.

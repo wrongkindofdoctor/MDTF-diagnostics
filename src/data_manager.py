@@ -173,7 +173,7 @@ class DataSourceAttributesBase():
     LASTYR: str = util.MANDATORY
     date_range: util.DateRange = dc.field(init=False)
     CASE_ROOT_DIR: str = ""
-    convention: str = ""
+
     log: dc.InitVar = _log
 
     def _set_case_root_dir(self, log=_log):
