@@ -3,12 +3,9 @@ Base classes implementing logic for querying, fetching and preprocessing
 model data requested by the PODs for multirun mode
 (i.e., a single POD is associated with multiple data sources)
 """
-import dataclasses as dc
-import typing
-from abc import ABCMeta
 
-from src import util, diagnostic
-
+from src import util, data_manager, diagnostic, core, preprocessor
+import collections
 import logging
 
 _log = logging.getLogger(__name__)
@@ -25,6 +22,24 @@ _log = logging.getLogger(__name__)
 # General format is:
 # super(cls, instance-or-subclass).method(*args, **kw)
 # You can get the MRO of a class by running print(class.mro())
+
+
+
+# --------------------------------------------------------------------------
+
+# MRO: [<class '__main__.MultirunDataframeQueryDataSourceBase'>
+# <class '__main__.MultirunDataSourceBase'>
+# <class 'src.data_manager.DataframeQueryDataSourceBase'>
+# <class 'src.data_manager.DataSourceBase'>
+# <class 'src.core.MDTFObjectBase'>
+# <class 'src.util.logs.CaseLoggerMixin'>
+# <class 'src.util.logs._CaseAndPODHandlerMixin'>
+# <class 'src.util.logs.MDTFObjectLoggerMixinBase'>
+# <class 'src.data_manager.AbstractDataSource'>
+# <class 'src.data_manager.AbstractQueryMixin'>
+# <class 'src.data_manager.AbstractFetchMixin'>
+# <class 'abc.ABC'>
+# <class 'object'>]
 
 
 # defining attributes using dc.field default_factory means that all instances have a default type
@@ -63,34 +78,6 @@ _log = logging.getLogger(__name__)
     # _deactivation_log_level = logging.ERROR
     #  _interpreters = {'.py': 'python', '.ncl': 'ncl', '.R': 'Rscript'}
     #varlist = MultirunVarlist = None
-
-
-@util.mdtf_dataclass
-class MultirunVarlistEntry(diagnostic.Varlist, diagnostic.VarlistEntryBase):
-    # Attributes:
-    #         path_variable: Name of env var containing path to local data.
-    #         dest_path: list of paths to local data
-    # _id = util.MDTF_ID()           # fields inherited from core.MDTFObjectBase
-    # name: str
-    # _parent: object
-    # log = util.MDTFObjectLogger
-    # status: ObjectStatus
-    # standard_name: str             # fields inherited from data_model.DMVariable
-    # units: Units
-    # dims: list
-    # scalar_coords: list
-    # modifier: str
-    use_exact_name: bool = False
-    env_var: str = dc.field(default="", compare=False)
-    path_variable: list = dc.field(default_factory=list, compare=False)
-    dest_path: list = dc.field(default_factory=list, compare=False)
-    requirement: diagnostic.VarlistEntryRequirement = \
-        dc.field(default=diagnostic.VarlistEntryRequirement.REQUIRED, compare=False)
-    alternates: list = dc.field(default_factory=list, compare=False)
-    translation: typing.Any = dc.field(default=None, compare=False)
-    data: util.ConsistentDict = dc.field(default_factory=util.ConsistentDict, compare=False)
-    stage: diagnostic.VarlistEntryStage = dc.field(default=diagnostic.VarlistEntryStage.NOTSET, compare=False)
-    _deactivation_log_level = logging.INFO
 
 
    # @property
