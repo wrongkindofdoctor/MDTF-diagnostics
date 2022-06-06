@@ -7,6 +7,7 @@ import collections
 import dataclasses
 from src import util, core, diagnostic, xr_parser, preprocessor, cmip6
 from src import data_manager as dm
+from src import query_fetch_preprocess as qfp
 import pandas as pd
 
 import logging
@@ -309,9 +310,9 @@ class ExplicitFileDataAttributes(dm.DataSourceAttributesBase):
     # LASTYR: str
     # date_range: util.DateRange
     # CASE_ROOT_DIR: str
-    # convention: str
     # log: dataclasses.InitVar = _log
     config_file: str = None
+    convention: str = ""
 
     def __post_init__(self, log=_log):
         """Validate user input.
@@ -339,7 +340,7 @@ explicitFileDataSource_col_spec = dm.DataframeQueryColumnSpec(
 
 
 class ExplicitFileDataSource(
-    dm.OnTheFlyGlobQueryMixin, dm.LocalFetchMixin, dm.DataframeQueryDataSourceBase
+    qfp.OnTheFlyGlobQueryMixin, qfp.LocalFetchMixin, dm.DataframeQueryDataSourceBase
 ):
     """DataSource for dealing data in a regular directory hierarchy on a
     locally mounted filesystem. Assumes data for each variable may be split into

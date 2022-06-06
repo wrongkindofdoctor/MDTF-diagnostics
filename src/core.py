@@ -37,6 +37,7 @@ ObjectStatus.__doc__ = """
 - *SUCCEEDED*: Processing finished successfully.
 """
 
+
 @util.mdtf_dataclass
 class MDTFObjectBase(metaclass=util.MDTFABCMeta):
     """Base class providing shared functionality for the object hierarchy, which is:
@@ -60,6 +61,7 @@ class MDTFObjectBase(metaclass=util.MDTFABCMeta):
         # init object-level logger
         self.log = util.MDTFObjectLogger.get_logger(self._log_name)
 
+    # the @property decorator allows us to attach code to designated attribute, such as getter and setter methods
     @property
     def _log_name(self):
         if self._parent is None:
@@ -89,10 +91,13 @@ class MDTFObjectBase(metaclass=util.MDTFABCMeta):
         """Iterable of child objects associated with this object."""
         pass
 
+    # This is a figurative "birth" routine that generates an object full of child objects
     def iter_children(self, child_type=None, status=None, status_neq=None):
         """Generator iterating over child objects associated with this object.
 
         Args:
+            child_type: None or Type `type`; default None. If None, iterates over
+            all child objects regardless of their types
             status: None or :class:`ObjectStatus`, default None. If None,
                 iterates over all child objects, regardless of status. If a
                 :class:`ObjectStatus` value is passed, only iterates over
@@ -102,11 +107,11 @@ class MDTFObjectBase(metaclass=util.MDTFABCMeta):
                 If *status* is set, this setting is ignored.
         """
         iter_ = self._children
-        if child_type is not None:
+        if child_type is not None:  # return the iter_ elements that match a specified child_type
             iter_ = filter((lambda x: isinstance(x, child_type)), iter_)
-        if status is not None:
+        if status is not None:  # return the iter_ elements that match the specified status
             iter_ = filter((lambda x: x.status == status), iter_)
-        elif status_neq is not None:
+        elif status_neq is not None:  # return the iter elements that do NOT match status_neq
             iter_ = filter((lambda x: x.status != status_neq), iter_)
         yield from iter_
 
@@ -167,7 +172,8 @@ class ConfigManager(util.Singleton, util.NameSpace):
         else:
             # normal code path
             self.pod_data = pod_info_tuple.pod_data
-            self.update(cli_obj.config)
+            self.update(cli_obj.config)  # the update method is a Python built-in that adds items from
+            # an iterable or another dictionay to a dictionay
             backup_config = self.backup_config(cli_obj, case_d)
             self._configs[backup_config.name] = backup_config
             self._configs['log_config'] = ConfigTuple(
@@ -794,6 +800,7 @@ class VariableTranslator(util.Singleton):
 
 # ---------------------------------------------------------------------------
 
+
 class MDTFFramework(MDTFObjectBase):
     def __init__(self, cli_obj):
         super(MDTFFramework, self).__init__(
@@ -895,6 +902,12 @@ class MDTFFramework(MDTFObjectBase):
                 cli_obj.config.get('convention', ''),
                 extra={'tags': {util.ObjectLogTag.BANNER}}
             )
+        if cli_obj.config.get('data_type') == 'multi_run':
+            self.multirun = True
+            _log.info("Running framework in multi-run mode ")
+        else:
+            self.multirun = False
+            _log.info("Running framework in single-run mode ")
         # check this here, otherwise error raised about missing caselist is not informative
         try:
             if cli_obj.config.get('CASE_ROOT_DIR', ''):
@@ -1083,38 +1096,52 @@ class MDTFFramework(MDTFObjectBase):
         return False
 
     def main(self):
-        # only run first case in list until dependence on env vars cleaned up
-        self.cases = dict(list(self.cases.items())[0:1])
-
         new_d = dict()
-        for case_name, case_d in self.cases.items():
-            _log.info("### %s: initializing case '%s'.", self.full_name, case_name)
-            case = self.DataSource(case_d, parent=self)
-            case.setup()
-            new_d[case_name] = case
-        self.cases = new_d
-        util.transfer_log_cache(close=True)
+        # single run mode
+        if not self.multirun:
+            self.cases = dict(list(self.cases.items())[0:1])
+            for case_name, case_d in self.cases.items():
+                _log.info("### %s: initializing case '%s'.", self.full_name, case_name)
+                case = self.DataSource(case_d, parent=self)
+                case.setup()
+                new_d[case_name] = case
+            self.cases = new_d
+            util.transfer_log_cache(close=True)
 
-        for case_name, case in self.cases.items():
-            if not case.failed:
-                _log.info("### %s: requesting data for case '%s'.",
-                    self.full_name, case_name)
-                case.request_data()
-            else:
-                _log.info(("### %s: initialization for case '%s' failed; skipping "
-                    f"data request."), self.full_name, case_name)
+            for case_name, case in self.cases.items():
+                if not case.failed:
+                    _log.info("### %s: requesting data for case '%s'.",
+                              self.full_name, case_name)
+                    case.request_data()
+                else:
+                    _log.info(("### %s: initialization for case '%s' failed; skipping "
+                               f"data request."), self.full_name, case_name)
 
-            if not case.failed:
-                _log.info("### %s: running case '%s'.", self.full_name, case_name)
-                run_mgr = self.RuntimeManager(case, self.EnvironmentManager)
-                run_mgr.setup()
-                run_mgr.run()
-            else:
-                _log.info(("### %s: Data request for case '%s' failed; skipping "
-                    "execution."), self.full_name, case_name)
+                if not case.failed:
+                    _log.info("### %s: running case '%s'.", self.full_name, case_name)
+                    run_mgr = self.RuntimeManager(case, self.EnvironmentManager)
+                    run_mgr.setup()
+                    run_mgr.run()
+                else:
+                    _log.info(("### %s: Data request for case '%s' failed; skipping "
+                               "execution."), self.full_name, case_name)
 
-            out_mgr = self.OutputManager(case)
-            out_mgr.make_output()
+                out_mgr = self.OutputManager(case)
+                out_mgr.make_output()
+        # multirun mode
+        else:
+            self.cases = dict(list(self.cases.items()))
+            for pod in self.pod_list:
+                for case_name, case_d in self.cases.items():
+                    _log.info("### %s: initializing case '%s'.", self.full_name, case_name)
+                    case = self.MultirunDataSource(case_d, parent=self) # TODO--properly configure self with Multirundatasource att
+                    case.setup(pod)
+                   # case.setup_multirun(pod)
+                    new_d[case_name] = case
+                # use info from last case, since POD data is common to all cases
+                pod_config = case.get_pod_config(pod)
+                self.cases = new_d
+                util.transfer_log_cache(close=True)
 
         tempdirs = TempDirManager()
         tempdirs.cleanup()

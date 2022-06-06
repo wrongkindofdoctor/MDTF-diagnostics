@@ -130,54 +130,87 @@ VarlistEntryStage.__doc__ = """
 """
 
 @util.mdtf_dataclass
-class VarlistEntry(core.MDTFObjectBase, data_model.DMVariable,
-    _VarlistGlobalSettings, util.VarlistEntryLoggerMixin):
-    """Class to describe data for a single variable requested by a POD.
-    Corresponds to list entries in the "varlist" section of the POD's
-    settings.jsonc file.
-
-    Two VarlistEntries are equal (as determined by the ``__eq__`` method, which
-    compares fields without ``compare=False``) if they specify the same data
-    product, ie if the same output file from the preprocessor can be symlinked
-    to two different locations.
+class VarlistEntryBase(metaclass=util.MDTFABCMeta):
+    """Base class for VarlistEntry
 
     Attributes:
         use_exact_name: see docs
         env_var: Name of env var which is set to the variable's name in the
             provided dataset.
-        path_variable: Name of env var containing path to local data.
-        dest_path: Path to local data.
+        path_variable: Name of env var containing path(s) to local data.
+        dest_path: Path(s) to local data.
         alternates: List of lists of VarlistEntries.
         translation: :class:`core.TranslatedVarlistEntry`, populated by DataSource.
+        stage: enum to track processing stages of VarlistEntry classes
         data: dict mapping experiment_keys to DataKeys. Populated by DataSource.
     """
-    # _id = util.MDTF_ID()           # fields inherited from core.MDTFObjectBase
-    # name: str
-    # _parent: object
-    # log = util.MDTFObjectLogger
-    # status: ObjectStatus
-    # standard_name: str           # fields inherited from data_model.DMVariable
-    # units: Units
-    # dims: list
-    # scalar_coords: list
-    # modifier: str
-    use_exact_name: bool = False
-    env_var: str = dc.field(default="", compare=False)
-    path_variable: str = dc.field(default="", compare=False)
-    dest_path: str = ""
-    requirement: VarlistEntryRequirement = dc.field(
-        default=VarlistEntryRequirement.REQUIRED, compare=False
-    )
-    alternates: list = dc.field(default_factory=list, compare=False)
-    translation: typing.Any = dc.field(default=None, compare=False)
-    data: util.ConsistentDict = dc.field(default_factory=util.ConsistentDict,
-        compare=False)
-    stage: VarlistEntryStage = dc.field(
-        default=VarlistEntryStage.NOTSET, compare=False
-    )
 
-    _deactivation_log_level = logging.INFO # default log level for failure
+    def __init_subclass__(cls):
+        required_class_variables = [
+            'use_exact_name',
+            'env_var',
+            'path_variable',
+            'dest_path',
+            'requirement',
+            'alternates',
+            'translation',
+            'data',
+            'stage',
+            '_deactivation_log_level'
+        ]
+        for var in required_class_variables:
+            if not hasattr(cls, var):
+                raise NotImplementedError(
+                    f'Class {cls} lacks required `{var}` class attribute'
+                )
 
+    def __post_init__(self):
+        pass
+
+    @property
+    def _children(self):
+        pass
+
+    @property
+    def name_in_model(self):
+        pass
+
+    @classmethod
+    def from_struct(cls):
+        pass
+
+    def iter_alternates(self):
+
+        def _iter_alternates():
+            pass
+
+    @staticmethod
+    def alternates_str(alt_list):
+        pass
+
+    def debug_str(self):
+        pass
+
+    def iter_data_keys(self):
+        pass
+
+    def deactivate_data_key(self):
+        pass
+
+    @property
+    def local_data(self):
+        pass
+
+    def query_attrs(self):
+        def iter_query_attrs():
+            pass
+
+    @property
+    def env_vars(self):
+        pass
+
+@util.mdtf_dataclass
+class VarlistEntryMixin(object):
     def __post_init__(self, coords=None):
         # inherited from two dataclasses, so need to call post_init on each directly
         core.MDTFObjectBase.__post_init__(self)
@@ -447,16 +480,129 @@ class VarlistEntry(core.MDTFObjectBase, data_model.DMVariable,
                 d[dim.name + _coord_bounds_env_var_suffix] = trans_dim.bounds
         return d
 
+
+@util.mdtf_dataclass
+class VarlistEntry(VarlistEntryMixin, VarlistEntryBase, core.MDTFObjectBase, data_model.DMVariable,
+                   _VarlistGlobalSettings, util.VarlistEntryLoggerMixin):
+    """Class to describe data for a single variable requested by a POD.
+    Corresponds to list entries in the "varlist" section of the POD's
+    settings.jsonc file.
+
+    Two VarlistEntries are equal (as determined by the ``__eq__`` method, which
+    compares fields without ``compare=False``) if they specify the same data
+    product, ie if the same output file from the preprocessor can be symlinked
+    to two different locations.
+
+    Attributes:
+        use_exact_name: see docs
+        env_var: Name of env var which is set to the variable's name in the
+            provided dataset.
+        path_variable: Name of env var containing path to local data.
+        dest_path: Path to local data.
+        alternates: List of lists of VarlistEntries.
+        translation: :class:`core.TranslatedVarlistEntry`, populated by DataSource.
+        data: dict mapping experiment_keys to DataKeys. Populated by DataSource.
+    """
+    # _id = util.MDTF_ID()           # fields inherited from core.MDTFObjectBase
+    # name: str
+    # _parent: object
+    # log = util.MDTFObjectLogger
+    # status: ObjectStatus
+    # standard_name: str           # fields inherited from data_model.DMVariable
+    # units: Units
+    # dims: list
+    # scalar_coords: list
+    # modifier: str
+    use_exact_name: bool = False
+    env_var: str = dc.field(default="", compare=False)
+    path_variable: str = dc.field(default="", compare=False)
+    dest_path: str = ""
+    requirement: VarlistEntryRequirement = dc.field(
+        default=VarlistEntryRequirement.REQUIRED, compare=False
+    )
+    alternates: list = dc.field(default_factory=list, compare=False)
+    translation: typing.Any = dc.field(default=None, compare=False)
+    data: util.ConsistentDict = dc.field(default_factory=util.ConsistentDict,
+        compare=False)
+    stage: VarlistEntryStage = dc.field(
+        default=VarlistEntryStage.NOTSET, compare=False
+    )
+
+    _deactivation_log_level = logging.INFO # default log level for failure
+
+@util.mdtf_dataclass
+class MultirunVarlistEntry(VarlistEntryMixin, VarlistEntryBase, core.MDTFObjectBase, data_model.DMVariable,
+                           _VarlistGlobalSettings, util.VarlistEntryLoggerMixin):
+    # Attributes:
+    #         path_variable: Name of env var containing path to local data.
+    #         dest_path: list of paths to local data
+    # _id = util.MDTF_ID()           # fields inherited from core.MDTFObjectBase
+    # name: str
+    # _parent: object
+    # log = util.MDTFObjectLogger
+    # status: ObjectStatus
+    # standard_name: str             # fields inherited from data_model.DMVariable
+    # units: Units
+    # dims: list
+    # scalar_coords: list
+    # modifier: str
+    use_exact_name: bool = False
+    env_var: str = dc.field(default="", compare=False)
+    path_variable: list = dc.field(default_factory=list, compare=False)
+    dest_path: list = dc.field(default_factory=list, compare=False)
+    requirement: VarlistEntryRequirement = \
+        dc.field(default=VarlistEntryRequirement.REQUIRED, compare=False)
+    alternates: list = dc.field(default_factory=list, compare=False)
+    translation: typing.Any = dc.field(default=None, compare=False)
+    data: util.ConsistentDict = dc.field(default_factory=util.ConsistentDict, compare=False)
+    stage: VarlistEntryStage = dc.field(default=VarlistEntryStage.NOTSET, compare=False)
+    _deactivation_log_level = logging.INFO
+
+    # override VarlistEntryMixin post_init method to append path_variable strings to listt
+    def __post_init__(self, coords=None):
+        # inherited from two dataclasses, so need to call post_init on each directly
+        core.MDTFObjectBase.__post_init__(self)
+        # set up log (VarlistEntryLoggerMixin)
+        self.init_log()
+        data_model.DMVariable.__post_init__(self, coords)
+
+        # (re)initialize mutable fields here so that if we copy VE (eg with .replace)
+        # the fields on the copy won't point to the same object as the fields on
+        # the original.
+        self.translation = None
+        self.data: util.ConsistentDict()
+        # activate required vars
+        if self.status == core.ObjectStatus.NOTSET:
+            if self.requirement == VarlistEntryRequirement.REQUIRED:
+                self.status = core.ObjectStatus.ACTIVE
+            else:
+                self.status = core.ObjectStatus.INACTIVE
+
+        # env_vars
+        if not self.env_var:
+            self.env_var = self.name + _var_name_env_var_suffix
+        if not self.path_variable:
+            self.path_variable = self.name.upper() + _file_env_var_suffix
+
+        # self.alternates is either [] or a list of nonempty lists of VEs
+        if self.alternates:
+            if not isinstance(self.alternates[0], list):
+                self.alternates = [self.alternates]
+            self.alternates = [vs for vs in self.alternates if vs]
+
+
 class Varlist(data_model.DMDataSet):
     """Class to perform bookkeeping for the model variables requested by a
     single POD.
     """
     @classmethod
-    def from_struct(cls, d, parent):
+    def from_struct(cls, d, parent, multirun=False):
         """Parse the "dimensions", "data" and "varlist" sections of the POD's
         settings.jsonc file when instantiating a new :class:`Diagnostic` object.
 
         Args:
+            parent: instance of the parent class object
+            multirun: if True, use multirun methods
             d (:py:obj:`dict`): Contents of the POD's settings.jsonc file.
 
         Returns:
@@ -495,10 +641,16 @@ class Varlist(data_model.DMDataSet):
             for k,v in d['dimensions'].items()}
 
         assert 'varlist' in d
-        vlist_vars = {
-            k: VarlistEntry.from_struct(globals_d, dims_d, name=k, parent=parent, **v) \
-            for k,v in d['varlist'].items()
-        }
+        if multirun:
+            vlist_vars = {
+                k: MultirunVarlistEntry.from_struct(globals_d, dims_d, name=k, parent=parent, **v) \
+                for k, v in d['varlist'].items()
+            }
+        else:
+            vlist_vars = {
+                k: VarlistEntry.from_struct(globals_d, dims_d, name=k, parent=parent, **v) \
+                for k, v in d['varlist'].items()
+            }
         for v in vlist_vars.values():
             # validate & replace names of alt vars with references to VE objects
             for altv_name in _iter_shallow_alternates(v):
@@ -591,7 +743,7 @@ class Diagnostic(core.MDTFObjectBase, util.PODLoggerMixin):
             raise util.PodConfigError("Caught exception while parsing settings",
                 pod_name) from exc
         try:
-            pod.varlist = Varlist.from_struct(d, parent=pod)
+            pod.varlist = Varlist.from_struct(d, parent=pod, multirun=parent.multirun)
         except Exception as exc:
             raise util.PodConfigError("Caught exception while parsing varlist",
                 pod_name) from exc

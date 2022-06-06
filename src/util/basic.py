@@ -29,6 +29,11 @@ def abstract_attribute(obj=None):
     obj.__is_abstract_attribute__ = True
     return obj
 
+
+# class BLAH(metaclass=MDTFABCMeta) arg will change the class BLAH automatically when the class is created
+# A metaclass does NOT have to be a formal class (not confusing at all, but OK)
+# From this SO post <https://stackoverflow.com/questions/100003/what-are-metaclasses-in-python>:
+# Essentially, all MDTFABCMeta does is modify a class by adding a __call__ method to it
 class MDTFABCMeta(abc.ABCMeta):
     """Wrap the metaclass for abstract base classes to enable definition of
     abstract attributes via :func:`abstract_attribute`. Based on
@@ -38,6 +43,10 @@ class MDTFABCMeta(abc.ABCMeta):
         NotImplementedError: If a child class doesn't define an
             abstract attribute, by analogy with :py:func:`abc.abstract_method`.
     """
+
+    # The __call__ method allows the class to be called like a function
+    # >>> ABCM = abcMDTFABCMeta()
+    # >>> ABCM() # invoke the __call__ method on a class cls, and append the abstract_attributes set to ABCM
     def __call__(cls, *args, **kwargs):
         instance = abc.ABCMeta.__call__(cls, *args, **kwargs)
         abstract_attributes = set([])
