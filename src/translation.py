@@ -79,13 +79,14 @@ class Fieldlist:
             # and coordinates may be assigned to variables in multiple realms
             section_d = in_dict.pop(section_name, dict())
             if '$ref' in section_d.keys():
-                ref_file_query = pathlib.Path(root_dir, 'data', section_d['$ref'])
-                ref_file_path = str(ref_file_query)
-                assert ".json" in ref_file_query.suffix, f"{ref_file_path} is not a json(c) file"
-                coord_file_entries = util.read_json(ref_file_path, log=log)
+                for item in section_d['$ref']:
+                    ref_file_query = pathlib.Path(root_dir, 'data', item)
+                    ref_file_path = str(ref_file_query)
+                    assert ".json" in ref_file_query.suffix, f"{ref_file_path} is not a json(c) file"
+                    coord_file_entries = util.read_json(ref_file_path, log=log)
 
-                regex_dict = util.RegexDict(coord_file_entries)
-                section_d.update([r for r in regex_dict.get_matching_value('axis')][0])
+                    regex_dict = util.RegexDict(coord_file_entries)
+                    section_d.update([r for r in regex_dict.get_matching_value('axis')][0])
                 section_d.pop('$ref', None)
 
             return section_d
@@ -99,7 +100,7 @@ class Fieldlist:
                 lut_dict['entries'][k] = v
                 # note that realm and modifier class atts are empty strings
                 # by default and, therefore, so are the corresponding dictionary
-                # keys. TODO: be sure to handle empty keys in PP
+                # keys.
                 if 'modifier' not in v:
                     lut_dict['entries'][k].update({'modifier': ""})
                 if 'long_name' not in v:
@@ -107,6 +108,29 @@ class Fieldlist:
                 if 'scalar_coord_templates' in v:
                     sct_dict.update({k: v['scalar_coord_templates']})
             return lut_dict, sct_dict
+
+        # process information from reference files in the refs section of a fieldlist
+        def _process_variable_refs(section_name: str,
+                                   root_dir: str,
+                                   in_dict: collections.OrderedDict,
+                                   lut_dict) -> collections.OrderedDict:
+
+            section_d = in_dict.pop(section_name, dict())
+            if len(section_d) == 0:
+                return in_dict
+            for k, v in section_d.items():
+                assert isinstance(v, list), f'{section_name} must contain a `refs` entry that is type `list`'
+                for ref_file in v:
+                    ref_file_query = pathlib.Path(root_dir, 'data', ref_file)
+                    ref_file_path = str(ref_file_query)
+                    assert ".json" in ref_file_query.suffix, f"{ref_file_path} is not a json(c) file"
+                    variable_entries = util.read_json(ref_file_path, log=log)
+
+                    regex_dict = util.RegexDict(variable_entries)
+                    lut_dict['entries'].update([r for r in regex_dict.get_matching_value('variables')][0])
+            section_d.pop('$ref', None)
+
+            return lut_dict
 
         d['axes_lut'] = util.WormDict()
         temp_d = _process_coord('coords', d, code_root, log)
@@ -120,6 +144,9 @@ class Fieldlist:
         d['lut'] = util.WormDict()
         d['scalar_coord_templates'] = util.WormDict()
         temp_d, sc_d = _process_var('variables', d, temp_d)
+        #d['lut'].update(temp_d['entries'])
+        #temp_d = collections.defaultdict(util.WormDict)
+        temp_d = _process_variable_refs('refs', code_root, d, temp_d)
         d['lut'].update(temp_d['entries'])
         d['scalar_coord_templates'].update(sc_d)
         d['lut_standard_names'] = []
