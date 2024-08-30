@@ -117,9 +117,9 @@ class Fieldlist:
 
             section_d = in_dict.pop(section_name, dict())
             if len(section_d) == 0:
-                return in_dict
+                return lut_dict
             for k, v in section_d.items():
-                assert isinstance(v, list), f'{section_name} must contain a `refs` entry that is type `list`'
+                assert isinstance(v, list), f'{section_name} must contain a `variable_refs` entry that is type `list`'
                 for ref_file in v:
                     ref_file_query = pathlib.Path(root_dir, 'data', ref_file)
                     ref_file_path = str(ref_file_query)
@@ -128,8 +128,14 @@ class Fieldlist:
 
                     regex_dict = util.RegexDict(variable_entries)
                     lut_dict['entries'].update([r for r in regex_dict.get_matching_value('variables')][0])
-            section_d.pop('$ref', None)
-
+            # change the `cmor_varname` keys to `name`
+            for k, entry in lut_dict['entries'].items():
+                entry['name'] = entry.pop('CMOR_varname', None)
+                entry['realm'] = entry.pop('modeling_realm', None)
+                if entry.get('modifier', None) is None:
+                    entry['modifier'] = ""
+                if entry.get('standard_name', None) is None:
+                    entry['standard_name'] = ""
             return lut_dict
 
         d['axes_lut'] = util.WormDict()
@@ -140,18 +146,20 @@ class Fieldlist:
         for sn in d['axes_lut'].values():
             d['axes_standard_names'].append(sn['standard_name'])
 
-        temp_d = collections.defaultdict(util.WormDict)
-        d['lut'] = util.WormDict()
+        temp_d = collections.defaultdict(collections.OrderedDict)
+        d['lut'] = collections.OrderedDict()
         d['scalar_coord_templates'] = util.WormDict()
         temp_d, sc_d = _process_var('variables', d, temp_d)
         #d['lut'].update(temp_d['entries'])
         #temp_d = collections.defaultdict(util.WormDict)
-        temp_d = _process_variable_refs('refs', code_root, d, temp_d)
+        temp_d = _process_variable_refs('variable_refs', code_root, d, temp_d)
         d['lut'].update(temp_d['entries'])
         d['scalar_coord_templates'].update(sc_d)
         d['lut_standard_names'] = []
         for sn in d['lut'].values():
-            d['lut_standard_names'].append(sn['standard_name'])
+            if sn.get('standard_name', None) is not None:
+                if sn.get('standard_name') not in d['lut_standard_names']:
+                    d['lut_standard_names'].append(sn['standard_name'])
         return cls(**d)
 
     def to_CF(self, var_or_name) -> util.WormDict:
