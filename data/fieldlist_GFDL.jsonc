@@ -92,7 +92,7 @@
       "axis": "N"
     }
   },
-  "refs": {
+  "variable_refs": {
     "$ref": [
           "./gfdl-cmor-tables/gfdl_to_cmip6_vars.json",
           "./gfdl-cmor-tables/gfdl_to_cmip5_vars.json"
@@ -136,14 +136,14 @@
       "ndim": 3
     },
     "alb_sfc": {
-      "standard_name": "",
+      "standard_name": "surface_albedo",
       "long_name":"surface albedo",
       "realm": "atmos",
       "units": "%",
       "ndim": 3
     },
     "aliq": {
-      "standard_name": "",
+      "standard_name": "cloud_fraction_for_large_scale_liquid_clouds",
       "long_name": "Cloud fraction for large-scale liquid clouds",
       "realm": "atmos",
       "units": "1",
@@ -201,14 +201,14 @@
       "ndim": 3
     },
     "prec_ls": {
-      "standard_name": "",
+      "standard_name": "precipitation_rate_from_stratus_clouds",
       "long_name" : "Precipitation rate from strat cloud",
       "realm": "atmos",
       "units": "kg m-2 s-1",
       "ndim": 3
     },
     "prec_uwd": {
-      "standard_name": "",
+      "standard_name": "precipitation_rate_from_deep_plume",
       "long_name" : "Precipitation rate from deep plume",
       "realm": "atmos",
       "units": "kg m-2 s-1",
@@ -250,7 +250,7 @@
       "ndim": 3
     },
     "aer_c": {
-      "standard_name": "",
+      "standard_name": "aerosol_col",
       "long_name": "aerosol_col",
       "realm": "aerosol",
       "units": "kg m-2",
@@ -329,7 +329,7 @@
       "ndim": 3
     },
     "ice_wat": {
-      "standard_name": "",
+      "standard_name": "cloud_ice_water_specific_humidity",
       "long_name": "cloud ice water specific humidity",
       "realm": "atmos",
       "units": "kg kg-1",
@@ -378,7 +378,7 @@
       "ndim": 3
     },
     "swup_sfc_ad_clr": {
-      "standard_name": "clearsky_SW_flux_up_at_surface_without_aerosol",
+      "standard_name": "clear_sky_SW_flux_up_at_surface_without_aerosol",
       "long_name": "",
       "realm": "atmos",
       "units": "W m-2",
@@ -404,7 +404,7 @@
       "ndim": 3
     },
     "lwdn_sfc_clr": {
-      "standard_name": "clea_rsky_LW_flux_down_at_surface",
+      "standard_name": "clear_sky_LW_flux_down_at_surface",
       "long_name": "",
       "realm": "atmos",
       "units": "W m-2",
@@ -463,14 +463,14 @@
       "ndim": 3
     },
     "snow_conv": {
-      "standard_name": "",
+      "standard_name": "frozen_precipitation_rate_from_convection",
       "long_name": "Frozen precip rate from convection",
       "realm": "atmos",
       "units": "kg m-2 s-1",
       "ndim": 3
     },
     "snow_ls": {
-      "standard_name": "",
+      "standard_name": "frozen_precipitation_rate_from_stratus_clouds",
       "long_name": "Frozen precip rate from strat cloud",
       "realm": "atmos",
       "units": "kg m-2 s-1",
@@ -491,7 +491,7 @@
       "ndim": 4
     },
     "tdt_dyn": {
-      "standard_name": "",
+      "standard_name": "tdt_dyn",
       "long_name": "tdt_dyn",
       "realm": "atmos",
       "units": "K s-1",
@@ -546,7 +546,7 @@
       "ndim": 3
     },
     "uw_precip": {
-      "standard_name": "",
+      "standard_name": "precipitation_rate_from_uw_shallow",
       "long_name": "Precipitation rate from uw shallow",
       "realm": "atmos",
       "units": "kg m-2 s-1",
@@ -569,28 +569,28 @@
       "ndim": 3
     },
     "wat_conv_col": {
-      "standard_name": "",
+      "standard_name": "column_total_water_tendency_from_convection",
       "long_name": "Column total water tendency from convection",
       "realm": "atmos",
       "units": "kg m-2 s-1",
       "ndim": 3
     },
     "wat_ls_col": {
-      "standard_name": "",
+      "standard_name": "column_total_water_tendency_from_stratus_cloud",
       "long_name": "Column total water tendency from strat cloud",
       "realm": "atmos",
       "units": "kg m-2 s-1",
       "ndim": 3
     },
     "wat_uw_col": {
-      "standard_name": "",
+      "standard_name": "column_total_water_tendency_from_uw_convection",
       "long_name": "Column total water tendency from UW convection",
       "realm": "atmos",
       "units": "kg m-2 s-1",
       "ndim": 3
     },
     "wind_ref": {
-      "standard_name": "",
+      "standard_name": "10m_wind",
       "long_name": "absolute value of wind at 10 m",
       "realm": "atmos",
       "units": "m s-1",
@@ -611,14 +611,14 @@
       "ndim": 3
     },
     "zg500": {
-      "standard_name": "",
+      "standard_name": "geopotential_height",
       "long_name": "Geopotential Height at 500 hPa",
       "realm": "atmos",
       "units": "m",
       "ndim": 3
     },
     "zg": {
-      "standard_name": "",
+      "standard_name": "geopotential_height",
       "long_name": "Geopotential Height",
       "realm": "atmos",
       "units": "m",
@@ -626,14 +626,14 @@
       "ndim": 4
     },
     "z_pbl": {
-      "standard_name": "",
+      "standard_name": "planetary_boundary_layer_depth",
       "long_name": "depth of planetary boundary layer",
       "realm": "atmos",
       "units": "m",
       "ndim": 3
     },
     "z_Ri_025":{
-        "standard_name": "",
+        "standard_name": "critical_bulk_richardson_height",
         "long_name": "Critical bulk Richardson height",
         "realm": "atmos",
         "units": "m",
@@ -647,7 +647,7 @@
         "ndim": 3
     },
     "soil_liq": {
-        "standard_name": "",
+        "standard_name": "bulk_density_of_liquid_water",
         "long_name": "bulk density of liquid water",
         "realm": "land",
         "units": "kg m-3",
@@ -661,28 +661,28 @@
       "ndim": 3
     },
     "soil_fgw": {
-        "standard_name": "",
+        "standard_name": "groundwater_storage_fraction_above_base_elevation",
         "long_name": "groundwater storage frac above base elev",
         "realm": "land",
         "units": "1",
         "ndim": 3
     },
     "soil_wtdep": {
-      "standard_name": "",
+      "standard_name": "depth_below_surface_to_saturated_soil",
       "long_name": "depth below sfc to saturated soil",
       "realm": "land",
       "units": "m",
       "ndim": 3
     },
     "albedo_dif": {
-      "standard_name": "",
+      "standard_name": "land_surface_albedo_for_diffuse_light",
       "long_name": "land surface albedo for diffuse light",
       "realm": "land",
       "units": "1",
       "ndim": 4
     },
     "albedo_dir": {
-      "standard_name": "",
+      "standard_name": "land_surface_albedo_for_direct_light",
       "long_name": "land surface albedo for direct light",
       "realm": "land",
       "units": "1",
@@ -710,7 +710,7 @@
       "ndim": 3
     },
      "theta": {
-      "standard_name": "",
+      "standard_name": "average_soil_wetness_for_carbon_decomposition",
       "long_name": "average soil wetness for carbon decomposition",
       "realm": "land",
       "units": "m3 m-3",
@@ -724,7 +724,7 @@
       "ndim": 3
     },
     "evap": {
-      "standard_name": "",
+      "standard_name": "evaporation_rate",
       "long_name": "evaporation rate",
       "realm": "atmos",
       "units": "kg m-2 s-1",
@@ -736,10 +736,10 @@
       "realm": "atmos",
       "units": "kg m-2 s-1",
       "ndim": 3
-    },
-  "env_vars" : {
+    }
+  //"env_vars" : {
     // 0 for CMIP/GFDL date index start, 1 for CESM native date index start
-    "date_int_offset" : 0
-  }
+  //  "date_int_offset" : 0
+ // }
  }
 }
