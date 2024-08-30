@@ -92,10 +92,13 @@
       "axis": "N"
     }
   },
-  "variables" : {
+  "refs": {
     "$ref": [
-          "./gfdl-cmor-tables/gfdl_to_cmip6_vars.json"],
-          //"./gfdl-cmor-tables/gfdl_to_cmip5_vars.json"
+          "./gfdl-cmor-tables/gfdl_to_cmip6_vars.json",
+          "./gfdl-cmor-tables/gfdl_to_cmip5_vars.json"
+      ]
+  },
+  "variables" : {
     "areacello": {
       "standard_name": "cell_area",
       "realm": "ocean",
