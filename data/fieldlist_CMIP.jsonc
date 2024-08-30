@@ -12,7 +12,7 @@
       "positive": "down",
       "axis": "Z"
     },
-    "$ref": "./cmip6-cmor-tables/Tables/CMIP6_coordinate.json"
+    "$ref": ["./cmip6-cmor-tables/Tables/CMIP6_coordinate.json"]
    },
   "variables" : {
     "deptho": {

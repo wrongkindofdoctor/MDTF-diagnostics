@@ -5,11 +5,8 @@
 // CF variables not on that list are commented out
 {
   "name" : "GFDL",
-  "models": ["AM4", "CM4", "ESM4", "SPEAR"], // others?
+  "models": ["AM4", "CM4", "ESM4", "SPEAR"],
   "coords" : {
-    // only used for taking slices, unit conversion
-    // 'PLACEHOLDER' prefix indicates that coordinate names are to be set based
-    // on their values in model data
     "lon": {
       "axis": "X",
       "standard_name": "longitude",
@@ -20,8 +17,8 @@
       "standard_name": "latitude",
       "units": "degrees_north"
     },
-    "yh": {
-      "axis": "Y",
+    "xh": {
+      "axis": "X",
       "standard_name": "h_point_nominal_longitude",
       "long_name": "h point nominal latitude",
       "units": "degrees_north"
@@ -96,9 +93,9 @@
     }
   },
   "variables" : {
-    "$ref": "./gfdl-cmor-tables/gfdl_to_cmip6_vars.json",
-    "$ref": "./gfdl-cmor-tables/gfdl_to_cmip5_vars.json",
-
+    "$ref": [
+          "./gfdl-cmor-tables/gfdl_to_cmip6_vars.json"],
+          //"./gfdl-cmor-tables/gfdl_to_cmip5_vars.json"
     "areacello": {
       "standard_name": "cell_area",
       "realm": "ocean",
@@ -736,10 +733,10 @@
       "realm": "atmos",
       "units": "kg m-2 s-1",
       "ndim": 3
-    }
-  },
+    },
   "env_vars" : {
     // 0 for CMIP/GFDL date index start, 1 for CESM native date index start
     "date_int_offset" : 0
   }
+ }
 }
