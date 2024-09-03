@@ -189,7 +189,7 @@ class Fieldlist:
             if var_dict['standard_name'] == standard_name\
                     and var_dict['realm'] == realm\
                     and var_dict['modifier'] == modifier:
-                if not var_dict['long_name'] or var_dict['long_name'].lower() == long_name.lower():
+                if long_name == "" or var_dict['long_name'] == "" or var_dict['long_name'].lower() == long_name.lower():
                     return var_name
             else:
                 if var_dict['standard_name'] in precip_vars and standard_name in precip_vars:
@@ -226,14 +226,14 @@ class Fieldlist:
         lut1 = dict()
         for k, v in self.lut.items():
             if v['standard_name'] == standard_name and v['realm'] == realm and v['modifier'] == modifier:
-                if 'long_name' not in v or v['long_name'].strip('') == '':
-                    v['long_name'] = long_name
+                #if 'long_name' not in v or v['long_name'].strip('') == '':
+                #    v['long_name'] = long_name
                 v['name'] = k
                 lut1.update({k: v})
 
         entries = tuple(lut1.values())
         if len(entries) > 1:
-            _log.error(f'Found multiple entries in {self.name} Fieldlist for {standard_name}')
+            _log.info(f'Found multiple entries in {self.name} Fieldlist matching POD requirements for {standard_name}')
         fl_entries = dict()
         for e in entries:
             fl_entries.update({e['name']: copy.deepcopy(e)})
@@ -366,13 +366,14 @@ class Fieldlist:
                                             new_coord = v
                                             break
         else:
-            new_coord = [lut1.values()][0]
+            new_coord = lut1
+            coord_name = lut1.keys()
         if hasattr(coord, 'is_scalar') and coord.is_scalar:
-            coord_name = ""
-            if new_coord.get('name', None):
+            if 'name' in new_coord:
                 coord_name = new_coord['name']
-            elif new_coord.get('out_name', None):
+            elif 'out_name' in new_coord:
                 coord_name = new_coord['out_name']
+
             coord_copy = copy.deepcopy(new_coord)
             coord_copy['value'] = units.convert_scalar_coord(coord,
                                                              coord_copy['units'],
@@ -421,11 +422,17 @@ class Fieldlist:
             # information from FieldList for the DataSource convention
             # Modifiers that are not defined are set to empty strings when variable and fieldlist
             # objects are initialized
-            fl_atts = [v for v in fl_entries.values()][0]
-            new_name = self.to_CF_standard_name(fl_atts['standard_name'],
-                                                fl_atts['long_name'],
-                                                fl_atts['realm'],
-                                                fl_atts['modifier'])
+
+            # TODO just use the 4D varable names and manually append lev suffix if necessary
+            for entry, attrs in fl_entries.items():
+                new_name = self.to_CF_standard_name(attrs['standard_name'],
+                                                        attrs['long_name'],
+                                                        attrs['realm'],
+                                                        attrs['modifier'])
+                # prioritize 4-D field vars over single level vars if present
+                if attrs.get('scalar_coord_templates', None) is not None and has_scalar_coords:
+                    break
+
         # build reference dictionary of axes classes so that any scalar_coords are cast to
         # corresponding Varlist[]Coordinate classes
         class_dict = None
