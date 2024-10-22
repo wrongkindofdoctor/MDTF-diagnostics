@@ -3,10 +3,26 @@ import xarray as xr
 import cftime
 import zarr
 
+month_days = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+
 
 def generate_data():
-    days = np.arange(15, 366, 30)
-    time = [cftime.DatetimeNoLeap(*x, calendar="noleap") for x in (1, 0, [d for d in days])]
+    # daily data from mdtf_test_data time
+    nyears = 1
+    startyear = 1
+    months = list(np.arange(1, 13))
+    days = [np.arange(1, month_days[n] + 1) for n, x in enumerate(months)]
+    days = [item for sublist in days for item in sublist]
+    days = days * nyears
+    months = [[months[n]] * month_days[n] for n, x in enumerate(months)]
+    months = [item for sublist in months for item in sublist]
+    months = months * nyears
+    years = list(np.arange(startyear, startyear + nyears))
+    years = [[years[x]] * 365 for x in range(0, len(years))]
+    years = [item for sublist in years for item in sublist]
+    hours = [0] * len(days)
+    time_tuple = list(zip(years, months, days, hours))
+    time = [cftime.DatetimeNoLeap(*x, calendar="noleap") for x in time_tuple]
     time_attrs = {
         "name": "time",
         "long_name": "time",
@@ -15,7 +31,7 @@ def generate_data():
         "bounds": "time_bnds",
         "standard_name": "time",
         "description": "Temporal mean",
-        "units": "days since 2004-01-01 00:00:00",
+        "units": "days since 0001-01-01 00:00:00",
     }
     lat = np.arange(-89.5, 89.5, 2)
     lat_attrs = dict(name="lat",
@@ -32,8 +48,7 @@ def generate_data():
                      axis="X")
 
     plev19 = np.array(
-        [
-            100000.0,
+           [100000.0,
             92500.0,
             85000.0,
             70000.0,
@@ -52,7 +67,7 @@ def generate_data():
             1000.0,
             500.0,
             100.0,
-        ]
+            ]
     )
     plev19_attrs = dict(name="plev19",
                         standard_name="air_pressure",
@@ -61,8 +76,8 @@ def generate_data():
                         positive="down")
 
     temp = xr.DataArray(
-            np.random.uniform(low=208.0, high=312.0, size=(12, 9, 144, 90)),
-            dims=("plev19", "latitude", "longitude", "time"),
+            np.random.uniform(low=208.0, high=312.0, size=(len(plev19), len(lat), len(lon), len(time))),
+            dims=("plev19", "lat", "lon", "time"),
             coords={
                 "plev19": plev19,
                 "latitude": lat,
@@ -75,16 +90,20 @@ def generate_data():
                    "realm": "atmos"},
     )
     ds = xr.Dataset({"temp": temp},
-                    coords={"plev19": (plev19,
+                    coords={"plev19": ('plev19',
+                                       plev19,
                                        plev19_attrs
                                        ),
-                            "latitude": (lat,
+                            "latitude": ('lat',
+                                         lat,
                                          lat_attrs
                                          ),
-                            "longitude": (lon,
+                            "longitude": ('lon',
+                                          lon,
                                           lon_attrs
                                           ),
-                            "time": (time,
+                            "time": ('time',
+                                     time,
                                      time_attrs
                                      )
 
