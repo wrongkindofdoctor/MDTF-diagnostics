@@ -113,7 +113,6 @@ def generate_data():
                     )
     print(ds)
 
-
 def write_zarr():
     pass
 
