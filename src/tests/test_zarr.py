@@ -86,7 +86,7 @@ def generate_daily_data(startyear: int, nyears: int) -> list:
     return time
 
 
-time = generate_daily_data(1, 5)
+time = generate_daily_data(1, 4)
 
 
 def generate_xr_data() -> xr.Dataset:
@@ -146,26 +146,21 @@ def generate_zarr_data():
     # https://flox.readthedocs.io/en/latest/user-stories/climatology.html
     def set_attrs(zarr_array: zarr.array, attr_dict: dict):
         for k, v in attr_dict.items():
-            zarr_array[k] = v
+            zarr_array.attrs[k] = v
 
-    temp = zarr.array(np.random.uniform(low=208.0, high=312.0, size=(len(plev19), len(lat), len(lon), len(time))),
+    tempz = zarr.array(np.random.uniform(low=208.0, high=312.0, size=(len(plev19), len(lat), len(lon), len(time))),
                       chunks=(-1, -1, -1, 365))
-    set_attrs(temp, temp_attrs)
-    #temp.attrs["name"] = "temp"
-    #temp.attrs["standard_name"] = "air_temperature"
-    #temp.attrs["units"] = "K"
-    # temp.attrs["realm"] =  "atmos"
-    precip = zarr.array(np.random.uniform(low=5.0e-12, high=1.0e-4, size=(len(lat), len(lon), len(time))),
+    print(tempz.info)
+    set_attrs(tempz, temp_attrs)
+    precipz = zarr.array(np.random.uniform(low=5.0e-12, high=1.0e-4, size=(len(lat), len(lon), len(time))),
                         chunks=(-1, -1, 365))
-    temp.attrs["name"] = "temp"
-    temp.attrs["standard_name"] = "air_temperature"
-    temp.attrs["units"] = "K"
-    temp.attrs["realm"] = "atmos"
+    set_attrs(precipz, precip_attrs)
 
-    areacella = zarr.array(np.random.uniform(low=1.0, high=400, size=(len(lat), len(lon))),
-                           chunks=(-1,len(lon)/2))
+    areacellaz = zarr.array(np.random.uniform(low=1.0, high=400, size=(len(lat), len(lon))),
+                           chunks=(-1, -1))
+    set_attrs(areacellaz, areacella_attrs)
 
-
+    return tempz, precipz, areacellaz
 def write_zarr(ds: xr.Dataset) -> str:
     """Write an xarray dataset to a zarr datastore"""
     out_dir = os.getcwd()
@@ -212,11 +207,12 @@ def clean_up(zarr_dir: str):
 
 
 if __name__ == '__main__':
-    temp, precip, areacella = generate_zarr_data()
+    errno = 0
+    temp_zarr, precip_zarr, areacella_zarr = generate_zarr_data()
 
-    ds_write = generate_xr_data()
-    zarr_dir = write_zarr(ds_write)
-    ds_read = read_zarr(zarr_dir)
-    append_to_zarr(zarr_dir, ds_read)
-    errno = clean_up(zarr_dir)
+    #ds_write = generate_xr_data()
+    #zarr_dir = write_zarr(ds_write)
+    #ds_read = read_zarr(zarr_dir)
+    #append_to_zarr(zarr_dir, ds_read)
+    #errno = clean_up(zarr_dir)
     sys.exit(errno)
