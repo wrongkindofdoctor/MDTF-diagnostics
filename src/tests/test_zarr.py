@@ -62,6 +62,9 @@ time_attrs = {
     "base_time_unit": "days since 0001-01-01 00:00:00",
 }
 
+temp_attrs = dict(name="temp", standard_name="air_temperature", units="K", realm="atmos")
+precip_attrs = dict(name="precip", standard_name="precipitation_flux", realm="atmos", units="kg m-2 s-1")
+areacella_attrs = dict(name="areacella", standard_name="cell_area", units="m2", realm="atmos")
 
 def generate_daily_data(startyear: int, nyears: int) -> list:
     # daily data from mdtf_test_data time module
@@ -83,7 +86,7 @@ def generate_daily_data(startyear: int, nyears: int) -> list:
     return time
 
 
-time = generate_daily_data(10, 1)
+time = generate_daily_data(1, 5)
 
 
 def generate_xr_data() -> xr.Dataset:
@@ -92,26 +95,17 @@ def generate_xr_data() -> xr.Dataset:
     temp = xr.DataArray(
         np.random.uniform(low=208.0, high=312.0, size=(len(plev19), len(lat), len(lon), len(time))),
         dims=("plev19", "lat", "lon", "time"),
-        attrs={"name": "temp",
-               "standard_name": "air_temperature",
-               "units": "K",
-               "realm": "atmos"}
+        attrs=temp_attrs
     )
     precip = xr.DataArray(
         np.random.uniform(low=5.0e-12, high=1.0e-4, size=(len(lat), len(lon), len(time))),
         dims=("lat", "lon", "time"),
-        attrs={"name": "precip",
-               "standard_name": "precipitation_flux",
-               "realm": "atmos",
-               "units": "kg m-2 s-1"}
+        attrs=precip_attrs
     )
     areacella = xr.DataArray(
         np.random.uniform(low=1.0, high=400, size=(len(lat), len(lon))),
         dims=("lat", "lon"),
-        attrs={"name": "areacella",
-               "standard_name": "cell_area",
-               "realm": "atmos",
-               "units": "m2"}
+        attrs=areacella_attrs
     )
     # instantiate dataset
     ds = xr.Dataset({
@@ -145,14 +139,31 @@ def generate_xr_data() -> xr.Dataset:
 
 
 def generate_zarr_data():
+    # create zarr arrays
     # chunk data along the time dimension in 1-year intervals
     # It's the largest dimension, and the interval is regular (noleap)
     # essentially, you want your chunks to be smaller than the interval of the chunked dimension(s)
     # https://flox.readthedocs.io/en/latest/user-stories/climatology.html
+    def set_attrs(zarr_array: zarr.array, attr_dict: dict):
+        for k, v in attr_dict.items():
+            zarr_array[k] = v
+
     temp = zarr.array(np.random.uniform(low=208.0, high=312.0, size=(len(plev19), len(lat), len(lon), len(time))),
                       chunks=(-1, -1, -1, 365))
+    set_attrs(temp, temp_attrs)
+    #temp.attrs["name"] = "temp"
+    #temp.attrs["standard_name"] = "air_temperature"
+    #temp.attrs["units"] = "K"
+    # temp.attrs["realm"] =  "atmos"
     precip = zarr.array(np.random.uniform(low=5.0e-12, high=1.0e-4, size=(len(lat), len(lon), len(time))),
                         chunks=(-1, -1, 365))
+    temp.attrs["name"] = "temp"
+    temp.attrs["standard_name"] = "air_temperature"
+    temp.attrs["units"] = "K"
+    temp.attrs["realm"] = "atmos"
+
+    areacella = zarr.array(np.random.uniform(low=1.0, high=400, size=(len(lat), len(lon))),
+                           chunks=(-1,len(lon)/2))
 
 
 def write_zarr(ds: xr.Dataset) -> str:
@@ -201,6 +212,8 @@ def clean_up(zarr_dir: str):
 
 
 if __name__ == '__main__':
+    temp, precip, areacella = generate_zarr_data()
+
     ds_write = generate_xr_data()
     zarr_dir = write_zarr(ds_write)
     ds_read = read_zarr(zarr_dir)
