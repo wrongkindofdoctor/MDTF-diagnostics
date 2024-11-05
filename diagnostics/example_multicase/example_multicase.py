@@ -69,11 +69,12 @@ import yaml
 # Part 1: Read in the model data
 # ------------------------------
 # Debugging: remove following line in final PR
-work_dir = os.environ["WORK_DIR"]
+# work_dir = os.environ["WORK_DIR"]
+work_dir='/Users/jess/mdtf/wkdir/MDTF_output/example_multicase'
 # Receive a dictionary of case information from the framework
 print("reading case_info")
 # Remove following line final PR
-# os.environ["case_env_file"] = os.path.join(work_dir, "case_info.yml")
+os.environ["case_env_file"] = os.path.join(work_dir, "case_info.yml")
 case_env_file = os.environ["case_env_file"]
 assert os.path.isfile(case_env_file), f"case environment file not found"
 with open(case_env_file, 'r') as stream:
@@ -149,7 +150,9 @@ plt.legend()
 plt.title("Zonal Mean Surface Air Temperature Anomaly")
 
 # save the plot in the right location
-assert os.path.isdir(f"{work_dir}/model/PS"), f'Assertion error: {work_dir}/model/PS not found'
+# assert os.path.isdir(f"{work_dir}/model/PS"), f'Assertion error: {work_dir}/model/PS not found'
+if not os.path.isdir(f"{work_dir}/model/PS"):
+    os.makedirs(f"{work_dir}/model/PS", exist_ok=True)
 plt.savefig(f"{work_dir}/model/PS/example_multicase_plot.eps", bbox_inches="tight")
 
 
