@@ -10,7 +10,7 @@ dependencies:
 - python=3.12
 - ghostscript
 - numpy=1.26.4
-- netCDF4=1.6.4
+- netCDF4=1.6.5
 - cftime=1.6.2
 - xarray=2024.1.1
 # Note: newer versions of cf_xarray are causing issues with missing
@@ -31,3 +31,5 @@ dependencies:
 - click=8.1.7
 - ghostscript=10.02.1
 - pybind11=2.12.0
+- kerchunk=0.2.7
+- fsspec=2024.10.0
