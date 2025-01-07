@@ -31,9 +31,7 @@ def gen_json_metadata_files(file_path: str, output_dir: str):
 
 @click.option('-i',
               '--input_dir',
-              required=False,
-              default=lambda: os.getcwd(),
-              show_default = '(Current Working Directory)',
+              required=True,
               type=click.Path(),
               help='Path to the directory with target files'
               )
