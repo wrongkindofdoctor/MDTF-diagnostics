@@ -15,25 +15,14 @@ import kerchunk
 import fsspec
 import os
 import sys
-import ujson
 
-
-def gen_json_metadata_files(file_path: str, output_dir: str):
-    """Generate json metadata files for each file on a local file system for use with kerchunk
-    """
-    so = dict(
-        mode="rb", anon=True, default_fill_cache=False, default_cache_type="none"
-    )
-    with fsspec.open(file_path, **so) as inf:
-        h5chunks = kerchunk.hdf.SingleHdf5ToZarr(inf, file_path, inline_threshold=300)
-        with open(f"{output_dir}/{file_path.split('/')[-1]}.json", 'wb') as outf:
-            outf.write(ujson.dumps(h5chunks.translate()).encode())
 
 @click.option('-i',
               '--input_dir',
               required=True,
+              default='/archive/Jacob.Mims/fre/FMS2024.02_OM5_20240819/CM4.5v01_om5b06_piC_noBLING_NB/gfdl.ncrc5-intel23-prod-openmp/pp/atmos_cmip/ts/',
               type=click.Path(),
-              help='Path to the directory with target files'
+              help='Path to the directory with target files. Can include wildcards (*)'
               )
 @click.option("-o",
               "--output_dir",
@@ -49,7 +38,7 @@ def gen_json_metadata_files(file_path: str, output_dir: str):
               default='local',
               help="Type of system files are stored on")
 @click.command()
-def main(input_dir: click.Path, output_dir: click.Path, file_system) -> int :
+def run(input_dir: click.Path, output_dir: click.Path, file_system) -> int :
     config = dict({'input_dir': input_dir,
                    'output_dir': output_dir,
                    'system': file_system}
@@ -57,8 +46,33 @@ def main(input_dir: click.Path, output_dir: click.Path, file_system) -> int :
     for k, v in config.items():
         print(f'Config {k} : {v}')
 
+    # Code adapted from: https://guide.cloudnativegeo.org/kerchunk/kerchunk-in-practice.html
+    # Initiate fsspec filesystem for reading.
+    if config['system'] == 'local':
+        fs_read = fsspec.filesystem("local")
+        dir_path = config['input_dir']
+
+    else:
+        # set anon=True if dataset on AWS does not require users to be logged in to access.
+        fs_read = fsspec.filesystem("s3", anon=True)
+        dir_path = f"s3:/" + input_dir
+    # Retrieve list of available data.
+    if '*' not in dir_path:
+        if dir_path.endswith('/'):
+            dir_path += '*'
+        else:
+            dir_path += '/*'
+    file_paths = fs_read.glob(dir_path)
+    if len(file_paths) > 0:
+        print(f"{len(file_paths)} file(s) found in {dir_path}")
+    else:
+        dir_path += '/*'
+        file_paths = fs_read.glob(dir_path)
+        if len(file_paths) == 0:
+            print(f"No files found in {dir_path}")
+            sys.exit(1)
 
 
 if __name__ == '__main__':
-    exit_code = main(prog_name='generate file metadata')
+    exit_code = run(prog_name='generate file metadata')
     sys.exit(exit_code)
