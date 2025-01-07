@@ -16,9 +16,10 @@ To use, run the following command:
 
 Input
 -----
-  --input_dir (str): path to the input directory
-  --output_dir (str): path to the output directory that will contain the metadata json file
-  --location (str): local = local filesystem, aws = Amazon Web Services S3 cloud system
+  --input_dir (str, required): path to the input directory
+  --output_dir (str, optional): path to the output directory that will contain the metadata json file. Defaults to
+    the current working directory.
+  --location (str, optional): local = local filesystem [default], aws = Amazon Web Services S3 cloud system
 
 Output
 ------
@@ -31,4 +32,6 @@ The required packages are included in the _MDTF_base conda
 - click
 - fsspec
 - kerchunk
+- os
+- sys
 - ujson
