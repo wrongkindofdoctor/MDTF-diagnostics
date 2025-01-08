@@ -31,3 +31,4 @@ dependencies:
 - pybind11=2.12.0
 - kerchunk=0.2.7
 - fsspec=2024.10.0
+- h5py=3.12.1
