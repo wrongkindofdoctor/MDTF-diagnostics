@@ -12,14 +12,14 @@ To use, run the following command:
 `> ./generate_file_metadata.py
 --input_dir [input directory path]
 --output_dir [output_directory_path]
---location [local | aws]`
+--location [local | s3]`
 
 Input
 -----
-  --input_dir (str, required): path to the input directory
+  --input_dir (str, required): path to the input directory (any subdirectories will be checked for .nc files)
   --output_dir (str, optional): path to the output directory that will contain the metadata json file. Defaults to
     the current working directory.
-  --location (str, optional): local = local filesystem [default], aws = Amazon Web Services S3 cloud system
+  --location (str, optional): local = local filesystem [default], s3 = Amazon Web Services S3 cloud system
 
 Output
 ------
