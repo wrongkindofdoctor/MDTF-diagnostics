@@ -1,0 +1,15 @@
+# Conda environment for development work.
+name: _MDTF_zarr
+channels:
+- conda-forge
+dependencies:
+# contents of python3_base
+- python=3.12
+- numpy=1.26.4
+- scipy=1.15.2
+- netCDF4=1.6.5
+- kerchunk=0.2.8
+- fsspec=2025.3.0
+- h5py=3.12.1
+- zarr=3.0.2
+- click

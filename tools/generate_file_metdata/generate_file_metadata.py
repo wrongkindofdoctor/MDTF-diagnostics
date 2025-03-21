@@ -12,7 +12,7 @@
 
 import click
 from kerchunk.combine import MultiZarrToZarr
-from kerchunk.hdf import SingleHdf5ToZarr
+from kerchunk.netCDF3 import NetCDF3ToZarr
 import fsspec
 import glob
 import json
@@ -20,54 +20,85 @@ import os
 import sys
 from tempfile import TemporaryDirectory
 
+
 def convert_netcdf(input_file, output_dir,old_version, new_version):
     """Convert netcdf 3/classic to netcdf 4/hdf5"""
     pass
 
-def write_fsspec(fs_read, input_file, output_dir):
-    with fs_read.open(input_file, **dict(mode="rb")) as infile:
-        print(f"Running kerchunk generation for {input_file}...")
-        # Chunks smaller than `inline_threshold` will be stored directly in the reference file as data (as opposed to a URL and byte range).
-        h5chunks = SingleHdf5ToZarr(infile, input_file, inline_threshold=300)
-        file_name = os.path.basename(input_file)
-        file_name = file_name.replace('.nc', '.json')
-        out_file_name = output_dir + '/' + file_name
-        if os.path.isfile(out_file_name):
-            print(f'Deleting existing file in {output_dir}')
-            os.remove(out_file_name)
+fs_out_parms = dict(mode='rb', anon=True, default_fill_cache=False, default_cache_type='first')
 
-        with open(out_file_name, "wb") as f:
-            f.write(json.dumps(h5chunks.translate()).encode())
-        print(f"Finished writing {out_file_name}")
-        return out_file_name
+def write_fsspec(input_file, output_dir):
+    print(f"Running kerchunk generation for {input_file}...")
+    # Chunks smaller than `inline_threshold` will be stored directly in the reference file as data (as opposed to a URL and byte range).
+    # h5chunks = SingleHdf5ToZarr(infile, input_file, inline_threshold=300)
+    result = NetCDF3ToZarr(input_file)
+    file_name = os.path.basename(input_file)
+    file_name = file_name.replace('.nc', '.json')
+    out_file_name = output_dir + '/' + file_name
+    if os.path.isfile(out_file_name):
+        print(f'Deleting existing file in {output_dir}')
+        os.remove(out_file_name)
+    with open(out_file_name, "wb") as f:
+        f.write(json.dumps(result.translate()).encode())
+    f.close()
+    print(f"Finished writing {out_file_name}")
+    return out_file_name
 
+class ConvertStrToList(click.Option):
+    def type_cast_value(self, ctx, value) -> list:
+        try:
+            value = str(value)
+            assert value.count('[') == 1 and value.count(']') == 1
+            list_as_str = value.replace('"', "'").split('[')[1].split(']')[0]
+            list_of_items = [item.strip().strip("'") for item in list_as_str.split(',')]
+            return list_of_items
+        except Exception:
+            raise click.BadParameter(value)
 
-@click.option('-i',
-              '--input_dir',
-              required=True,
-              default='/archive/Jacob.Mims/fre/FMS2024.02_OM5_20240819/CM4.5v01_om5b06_piC_noBLING_NB/gfdl.ncrc5-intel23-prod-openmp/pp/atmos_cmip/ts/',
+@click.option("--input_dir",
               type=click.Path(),
-              help='Path to the directory with target files.'
-                   ' Recursive search performed for .nc files in subdirectories.'
-              )
-@click.option("-o",
-              "--output_dir",
+              required=False,
+              default = '/archive/Jacob.Mims/fre/FMS2024.02_OM5_20240819/CM4.5v01_om5b06_piC_noBLING_NB/gfdl.ncrc5-intel23-prod-openmp/pp/atmos_cmip/ts/6hr/5yr',
+              help="Input directory with target subdirectories or files."
+                   "Recursive search performed for .nc files in subdirectories.")
+@click.option("--output_dir",
               type=click.Path(),
               required=False,
               default = '/net/jml/mdtf/', #default=lambda: os.getcwd(),
               show_default = '(Current Working Directory)',
               help="Directory where metadata file will be written")
+@click.option("-fout",
+              "--output_file",
+              type=click.STRING,
+              required=False,
+              default = 'combined',
+              show_default = 'combined',
+              help="Combined zarr json output file name")
 @click.option("-s",
               "--file_system",
               type=click.Choice(['local', 's3'], case_sensitive=False),
               required=False,
               default='local',
               help="Type of system files are stored on")
+@click.option('--include_vars',
+              required=False,
+              cls=ConvertStrToList,
+              default=['sos', 'zos'],
+              help='list of variables to search for in file names if you'
+                   'do not want all files in the input directory'
+              )
+
 @click.command()
-def run(input_dir: click.Path, output_dir: click.Path, file_system) -> int :
+def run(input_dir: click.Path,
+        output_dir: click.Path,
+        output_file: click.Path,
+        file_system,
+        include_vars) -> int :
     config = dict({'input_dir': input_dir,
                    'output_dir': output_dir,
-                   'system': file_system}
+                   'output_file': output_file,
+                   'system': file_system,
+                   'include_vars': include_vars}
                   )
     for k, v in config.items():
         print(f'Config {k} : {v}')
@@ -80,8 +111,15 @@ def run(input_dir: click.Path, output_dir: click.Path, file_system) -> int :
     # anon=True if dataset on AWS does not require users to be logged
     fs_read = fsspec.filesystem(config['system'])
     if config['system'] == 'local':
-        dir_path += '**/*.nc'
-        file_paths = glob.glob(dir_path, recursive=True)
+        file_paths = []
+        if len(config['include_vars']) > 0:
+            for var in config['include_vars']:
+                dir_path += '**/*.' + var + '*.nc'
+                glob_dir = glob.glob(dir_path, recursive=True)
+                file_paths.extend(glob_dir)
+        else:
+            dir_path += '**/*.nc'
+            file_paths = glob.glob(dir_path, recursive=True)
     else:
         dir_path = f"s3:/" + dir_path + '*.nc'
         # Retrieve list of available data
@@ -94,18 +132,26 @@ def run(input_dir: click.Path, output_dir: click.Path, file_system) -> int :
     temp_dir = TemporaryDirectory(prefix=config['output_dir'])
     assert os.path.isdir(temp_dir.name), "{out_dir} is not a directory".format(out_dir=temp_dir)
     try:
-        output_files = [write_fsspec(fs_read, f, temp_dir.name) for f in file_paths]
+        output_files = [write_fsspec(f, temp_dir.name) for f in file_paths]
         # combine individual references into single consolidated reference
+        print('Calling MultiZarrToZarr')
         mzz = MultiZarrToZarr(
             output_files,
             remote_protocol=config['system'],
             remote_options={'anon': True},
             concat_dims=['time'],
             coo_map={'time': 'cf:time'},
-            # inline_threshold=0 means don't story any raw data in the kerchunk reference file.
+            # inline_threshold=0 means don't store any raw data in the kerchunk reference file.
             inline_threshold=0
         )
+        print("Calling multiZarrToZarr.translate()")
         multi_kerchunk = mzz.translate()
+
+        print("Writing combined json file")
+        output_file = os.path.join(config['output_dir'], config['output_file'], '.json')
+        with open(output_file, 'wb') as f:
+            f.write(json.dumps(multi_kerchunk).encode())
+        f.close()
     except Exception as exc:
         print(exc)
         temp_dir.cleanup()
