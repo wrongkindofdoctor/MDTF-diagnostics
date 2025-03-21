@@ -148,7 +148,7 @@ def run(input_dir: click.Path,
         multi_kerchunk = mzz.translate()
 
         print("Writing combined json file")
-        output_file = os.path.join(config['output_dir'], config['output_file'], '.json')
+        output_file = os.path.join(config['output_dir'], config['output_file'] + '.json')
         with open(output_file, 'wb') as f:
             f.write(json.dumps(multi_kerchunk).encode())
         f.close()
