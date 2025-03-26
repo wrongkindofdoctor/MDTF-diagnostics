@@ -7,7 +7,9 @@
 # Input:
 # --input_dir: path to directory with input files
 # --output_dir: path to the directory where reference json will be written
-# --file_system [local | aws]: type of system files are stored on
+# --output file: name of the combined json file
+# --file_system [local | s3]: type of system files are stored on
+# --include vars: list of input variables to search for in the input_dir if you don't want metadata for all files
 # Output: json file with metadata for files in the input_dir
 
 import click
@@ -21,16 +23,10 @@ import sys
 from tempfile import TemporaryDirectory
 
 
-def convert_netcdf(input_file, output_dir,old_version, new_version):
-    """Convert netcdf 3/classic to netcdf 4/hdf5"""
-    pass
-
 fs_out_parms = dict(mode='rb', anon=True, default_fill_cache=False, default_cache_type='first')
 
 def write_fsspec(input_file, output_dir):
     print(f"Running kerchunk generation for {input_file}...")
-    # Chunks smaller than `inline_threshold` will be stored directly in the reference file as data (as opposed to a URL and byte range).
-    # h5chunks = SingleHdf5ToZarr(infile, input_file, inline_threshold=300)
     result = NetCDF3ToZarr(input_file)
     file_name = os.path.basename(input_file)
     file_name = file_name.replace('.nc', '.json')
@@ -60,33 +56,38 @@ class ConvertStrToList(click.Option):
               required=False,
               default = '/archive/Jacob.Mims/fre/FMS2024.02_OM5_20240819/CM4.5v01_om5b06_piC_noBLING_NB/gfdl.ncrc5-intel23-prod-openmp/pp/atmos_cmip/ts/6hr/5yr',
               help="Input directory with target subdirectories or files."
-                   "Recursive search performed for .nc files in subdirectories.")
+                   "Recursive search performed for .nc files in subdirectories."
+              )
 @click.option("--output_dir",
               type=click.Path(),
               required=False,
               default = '/net/jml/mdtf/', #default=lambda: os.getcwd(),
               show_default = '(Current Working Directory)',
-              help="Directory where metadata file will be written")
+              help="Directory where metadata file will be written"
+              )
 @click.option("-fout",
               "--output_file",
               type=click.STRING,
               required=False,
               default = 'combined',
               show_default = 'combined',
-              help="Combined zarr json output file name")
+              help="Combined zarr json output file name"
+              )
 @click.option("-s",
               "--file_system",
               type=click.Choice(['local', 's3'], case_sensitive=False),
               required=False,
               default='local',
-              help="Type of system files are stored on")
+              help="System where input files are stored"
+              )
 @click.option('--include_vars',
               required=False,
               cls=ConvertStrToList,
               default=['sos', 'zos'],
-              help='list of variables to search for in file names if you'
-                   'do not want all files in the input directory'
+              help="List of variables to search for in file names if you "
+                   "do not want all files in the input directory"
               )
+
 
 @click.command()
 def run(input_dir: click.Path,
@@ -129,8 +130,10 @@ def run(input_dir: click.Path,
     else:
         print(f"No files found in {dir_path}")
         return 1
+
     temp_dir = TemporaryDirectory(prefix=config['output_dir'])
     assert os.path.isdir(temp_dir.name), "{out_dir} is not a directory".format(out_dir=temp_dir)
+
     try:
         output_files = [write_fsspec(f, temp_dir.name) for f in file_paths]
         # combine individual references into single consolidated reference
@@ -152,6 +155,7 @@ def run(input_dir: click.Path,
         with open(output_file, 'wb') as f:
             f.write(json.dumps(multi_kerchunk).encode())
         f.close()
+
     except Exception as exc:
         print(exc)
         temp_dir.cleanup()
